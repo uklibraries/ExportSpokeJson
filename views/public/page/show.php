@@ -1,0 +1,1 @@
+{"interviewti_display":"<![CDATA[<?php echo item('Item Type Metadata', 'Interview Title'); ?>]]>,"interviewid_display":"<![CDATA[<?php echo item('Item Type Metadata', 'Interview Accession Number'); ?>]]>","id:"<![CDATA[<?php echo item('Dublin Core', 'Identifier'); ?>]]>"}
