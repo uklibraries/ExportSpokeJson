@@ -29,7 +29,7 @@ class Output_SpokeJson
     public function getCollectionFields($item)
     {
         $metadata = array(
-            'id' => metadata($item, array('Dublin Core', 'Identifier'), array('all' => true, 'no_filter' => true)),
+            'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
             'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('all' => true, 'no_filter' => true)),
             'format_display' => metadata($item, array('Dublin Core', 'Format'), array('all' => true, 'no_filter' => true)),
             'CollectionExternalLinkR_display' => metadata($item, array('Item Type Metadata', 'Collection External Link'), array('all' => true, 'no_filter' => true)),
@@ -51,7 +51,7 @@ class Output_SpokeJson
     public function getSeriesFields($item)
     {
         $metadata = array(
-            'id' => metadata($item, array('Dublin Core', 'Identifier'), array('all' => true, 'no_filter' => true)),
+            'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
             'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('all' => true, 'no_filter' => true)),
             'format_display' => metadata($item, array('Dublin Core', 'Format'), array('all' => true, 'no_filter' => true)),
             'SeriesExternalLinkR_display' => metadata($item, array('Item Type Metadata', 'Series External Link'), array('all' => true, 'no_filter' => true)),
@@ -73,7 +73,7 @@ class Output_SpokeJson
     public function getInterviewFields($item)
     {
         $metadata = array(
-            'id' => metadata($item, array('Dublin Core', 'Identifier'), array('all' => true, 'no_filter' => true)),
+            'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
             'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('all' => true, 'no_filter' => true)),
             'format_display' => metadata($item, array('Dublin Core', 'Format'), array('all' => true, 'no_filter' => true)),
             'InterviewUsageStatement_display' => metadata($item, array('Item Type Metadata', 'Interview Usage Statement'), array('all' => true, 'no_filter' => true)),
