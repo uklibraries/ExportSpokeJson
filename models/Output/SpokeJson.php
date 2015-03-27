@@ -2,7 +2,7 @@
 /**
  * Export SPOKEdb JSON
  *
- * @copyright 2015 Eric C. Weig
+ * @copyright 2015 Michael Slone <m.slone@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  * @package Omeka\Plugins\ExportSpokeJson */
 
