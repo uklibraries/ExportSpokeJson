@@ -30,7 +30,7 @@ class Output_SpokeJson
     {
         $metadata = array(
             'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
-            'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('all' => true, 'no_filter' => true)),
+            'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true)),
             'format_display' => metadata($item, array('Dublin Core', 'Format'), array('all' => true, 'no_filter' => true)),
             'CollectionExternalLinkR_display' => metadata($item, array('Item Type Metadata', 'Collection External Link'), array('all' => true, 'no_filter' => true)),
             'CollectionKeywordR_display' => metadata($item, array('Item Type Metadata', 'Collection Keyword'), array('all' => true, 'no_filter' => true)),
@@ -52,7 +52,7 @@ class Output_SpokeJson
     {
         $metadata = array(
             'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
-            'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('all' => true, 'no_filter' => true)),
+            'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true)),
             'format_display' => metadata($item, array('Dublin Core', 'Format'), array('all' => true, 'no_filter' => true)),
             'SeriesExternalLinkR_display' => metadata($item, array('Item Type Metadata', 'Series External Link'), array('all' => true, 'no_filter' => true)),
             'SeriesInterviewR_display' => metadata($item, array('Item Type Metadata', 'Series Interview'), array('all' => true, 'no_filter' => true)),
@@ -74,7 +74,7 @@ class Output_SpokeJson
     {
         $metadata = array(
             'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
-            'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('all' => true, 'no_filter' => true)),
+            'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true)),
             'format_display' => metadata($item, array('Dublin Core', 'Format'), array('all' => true, 'no_filter' => true)),
             'InterviewUsageStatement_display' => metadata($item, array('Item Type Metadata', 'Interview Usage Statement'), array('all' => true, 'no_filter' => true)),
             'InterviewExternalLinkR_display' => metadata($item, array('Item Type Metadata', 'Interview External Link'), array('all' => true, 'no_filter' => true)),
