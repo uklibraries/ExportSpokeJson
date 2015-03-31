@@ -108,29 +108,33 @@ class Output_SpokeJson
         $item = $this->_item;
         $metadata = array(
             'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
-            'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true)),
-            'format_display' => metadata($item, array('Dublin Core', 'Format'), array('all' => true, 'no_filter' => true)),
-            'InterviewUsageStatement_display' => metadata($item, array('Item Type Metadata', 'Interview Usage Statement'), array('all' => true, 'no_filter' => true)),
-            'InterviewExternalLinkR_display' => metadata($item, array('Item Type Metadata', 'Interview External Link'), array('all' => true, 'no_filter' => true)),
-            'InterviewYear_display' => metadata($item, array('Item Type Metadata', 'Interview Year'), array('all' => true, 'no_filter' => true)),
-            'InterviewRestrictionDetails_display' => metadata($item, array('Item Type Metadata', 'Interview Restriction Details'), array('all' => true, 'no_filter' => true)),
-            'InterviewMonth_display' => metadata($item, array('Item Type Metadata', 'Interview Month'), array('all' => true, 'no_filter' => true)),
-            'InterviewCacheFile_display' => metadata($item, array('Item Type Metadata', 'Interview Cache File'), array('all' => true, 'no_filter' => true)),
-            'InterviewKeywordsR_display' => metadata($item, array('Item Type Metadata', 'Interview Keywords'), array('all' => true, 'no_filter' => true)),
-            'InterviewDate_display' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
-            'InterviewerR_display' => metadata($item, array('Item Type Metadata', 'Interviewer'), array('all' => true, 'no_filter' => true)),
             'IntervieweeR_display' => metadata($item, array('Item Type Metadata', 'Interviewee'), array('all' => true, 'no_filter' => true)),
+            'InterviewerR_display' => metadata($item, array('Item Type Metadata', 'Interviewer'), array('all' => true, 'no_filter' => true)),
             'InterviewAccessionNumber_display' => metadata($item, array('Item Type Metadata', 'Interview Accession Number'), array('all' => true, 'no_filter' => true)),
-            'InterviewTitle_display' => metadata($item, array('Item Type Metadata', 'Interview Title'), array('all' => true, 'no_filter' => true)),
-            'InterviewDay_display' => metadata($item, array('Item Type Metadata', 'Interview Day'), array('all' => true, 'no_filter' => true)),
-            'UseRestrictions_display' => metadata($item, array('Item Type Metadata', 'Use Restrictions'), array('all' => true, 'no_filter' => true)),
-            'OnlineIdentifier_display' => metadata($item, array('Item Type Metadata', 'Online Identifier'), array('all' => true, 'no_filter' => true)),
-            'InterviewMasterType_display' => metadata($item, array('Item Type Metadata', 'Interview Master Type'), array('all' => true, 'no_filter' => true)),
-            'InterviewRightsStatement_display' => metadata($item, array('Item Type Metadata', 'Interview Rights Statement'), array('all' => true, 'no_filter' => true)),
-            'InterviewLCSubjectR_display' => metadata($item, array('Item Type Metadata', 'Interview LC Subject'), array('all' => true, 'no_filter' => true)),
             'InterviewCollection_display' => metadata($item, array('Item Type Metadata', 'Interview Collection'), array('all' => true, 'no_filter' => true)),
             'InterviewSeries_display' => metadata($item, array('Item Type Metadata', 'Interview Series'), array('all' => true, 'no_filter' => true)),
+            'InterviewTitle_display' => metadata($item, array('Item Type Metadata', 'Interview Title'), array('all' => true, 'no_filter' => true)),
+            'InterviewDate_display' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
         );
+        if ($this->rights() === "unrestricted") {
+            $metadata = array_merge($metadata, array(
+                'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true)),
+                'format_display' => metadata($item, array('Dublin Core', 'Format'), array('all' => true, 'no_filter' => true)),
+                'InterviewUsageStatement_display' => metadata($item, array('Item Type Metadata', 'Interview Usage Statement'), array('all' => true, 'no_filter' => true)),
+                'InterviewExternalLinkR_display' => metadata($item, array('Item Type Metadata', 'Interview External Link'), array('all' => true, 'no_filter' => true)),
+                'InterviewYear_display' => metadata($item, array('Item Type Metadata', 'Interview Year'), array('all' => true, 'no_filter' => true)),
+                'InterviewRestrictionDetails_display' => metadata($item, array('Item Type Metadata', 'Interview Restriction Details'), array('all' => true, 'no_filter' => true)),
+                'InterviewMonth_display' => metadata($item, array('Item Type Metadata', 'Interview Month'), array('all' => true, 'no_filter' => true)),
+                'InterviewCacheFile_display' => metadata($item, array('Item Type Metadata', 'Interview Cache File'), array('all' => true, 'no_filter' => true)),
+                'InterviewKeywordsR_display' => metadata($item, array('Item Type Metadata', 'Interview Keywords'), array('all' => true, 'no_filter' => true)),
+                'InterviewDay_display' => metadata($item, array('Item Type Metadata', 'Interview Day'), array('all' => true, 'no_filter' => true)),
+                'UseRestrictions_display' => metadata($item, array('Item Type Metadata', 'Use Restrictions'), array('all' => true, 'no_filter' => true)),
+                'OnlineIdentifier_display' => metadata($item, array('Item Type Metadata', 'Online Identifier'), array('all' => true, 'no_filter' => true)),
+                'InterviewMasterType_display' => metadata($item, array('Item Type Metadata', 'Interview Master Type'), array('all' => true, 'no_filter' => true)),
+                'InterviewRightsStatement_display' => metadata($item, array('Item Type Metadata', 'Interview Rights Statement'), array('all' => true, 'no_filter' => true)),
+                'InterviewLCSubjectR_display' => metadata($item, array('Item Type Metadata', 'Interview LC Subject'), array('all' => true, 'no_filter' => true)),
+            ));
+        }
 
         return $metadata;
     }
