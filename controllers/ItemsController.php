@@ -11,8 +11,6 @@ class ExportSpokeJson_ItemsController extends Omeka_Controller_AbstractActionCon
     public function exportAction()
     {
         $itemId = $this->_getParam('id');
-        #$item = $this->_helper->db->findById($itemId, 'Item');
-        #$item = $this->_helper->db->findById();
         Zend_Registry::get('bootstrap')->getResource('jobs')->sendLongRunning(
             'ExportSpokeJson_Job_ExportItem', array(
                 'itemId' => $itemId,
