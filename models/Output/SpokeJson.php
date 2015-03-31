@@ -10,24 +10,56 @@ class Output_SpokeJson
 {
     public function __construct($item)
     {
+        $this->_rights = NULL;
+        $this->_item = $item;
         $metadata = array();
-        $itemType = $item->getItemType();
-        switch($itemType->name) {
+        $this->_itemType = $item->getItemType()->name;
+        switch($this->_itemType) {
         case "collections":
-            $metadata = $this->getCollectionFields($item);
+            $metadata = $this->getCollectionFields();
             break;
         case "series":
-            $metadata = $this->getSeriesFields($item);
+            $metadata = $this->getSeriesFields();
             break;
         case "interviews":
-            $metadata = $this->getInterviewFields($item);
+            $metadata = $this->getInterviewFields();
             break;
         }
         $this->_metadata = $metadata;
     }
 
-    public function getCollectionFields($item)
+    public function rights()
     {
+        if (!isset($this->_rights)) {
+            $this->_rights = metadata($this->_item, array('Dublin Core', 'Rights'), array('no_filter' => true));
+        }
+        return $this->_rights;
+    }
+
+    public function id()
+    {
+        if (!isset($this->_id)) {
+            $this->_id = metadata($this->_item, array('Dublin Core', 'Identifier'), array('no_filter' => true));
+        }
+        return $this->_id;
+    }
+
+    public function title()
+    {
+        if (!isset($this->_title)) {
+            $this->_title = metadata($this->_item, array('Dublin Core', 'Title'), array('no_filter' => true));
+        }
+        return $this->_title;
+    }
+
+    public function itemType()
+    {
+        return $this->_itemType;
+    }
+
+    public function getCollectionFields()
+    {
+        $item = $this->_item;
         $metadata = array(
             'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
             'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true)),
@@ -48,8 +80,9 @@ class Output_SpokeJson
         return $metadata;
     }
 
-    public function getSeriesFields($item)
+    public function getSeriesFields()
     {
+        $item = $this->_item;
         $metadata = array(
             'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
             'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true)),
@@ -70,8 +103,9 @@ class Output_SpokeJson
         return $metadata;
     }
 
-    public function getInterviewFields($item)
+    public function getInterviewFields()
     {
+        $item = $this->_item;
         $metadata = array(
             'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
             'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true)),
@@ -107,4 +141,9 @@ class Output_SpokeJson
     }
 
     private $_metadata;
+    private $_item;
+    private $_id;
+    private $_title;
+    private $_rights;
+    private $_itemType;
 }

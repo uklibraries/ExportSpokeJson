@@ -7,27 +7,48 @@
  * @package Omeka\Plugins\ExportSpokeJson
  */
 
+require_once "jobs" . DIRECTORY_SEPARATOR . "ExportSpokeJson_Job_ExportItem.php";
+
 class ExportSpokeJsonPlugin extends Omeka_Plugin_AbstractPlugin
 {
-    protected $_filters = array(
-        'response_contexts',
-        'action_contexts',
+    protected $_hooks = array(
+        'admin_items_show_sidebar',
+        'define_routes',
     );
 
-    public function filterResponseContexts($contexts)
+    public function hookAdminItemsShowSidebar($args)
     {
-        $contexts['spoke-json'] = array(
-            'suffix' => 'spoke-json',
-            'headers' => array('Content-Type' => 'application/json')
-        );
-        return $contexts;
+        $item = $args['item'];
+        $output = new Output_SpokeJson($item);
+        if ($output->rights() === 'restricted') {
+            echo get_view()->partial(
+                'export-denied-panel.php',
+                array()
+            );
+        }
+        else {
+            echo get_view()->partial(
+                'export-panel.php',
+                array()
+            );
+        }
     }
 
-    public function filterActionContexts($contexts, $args)
+    public function hookDefineRoutes($args)
     {
-        if ($args['controller'] instanceof ItemsController) {
-            $contexts['show'][] = 'spoke-json';
-        }
-        return $contexts;
+        $args['router']->addRoute(
+            'export_spoke_json_route',
+            new Zend_Controller_Router_Route(
+                'items/export/:id',
+                array(
+                    'module' => 'export-spoke-json',
+                    'controller' => 'items',
+                    'action' => 'export'
+                ),
+                array(
+                    'id' => '\d+'
+                )
+            )
+        );
     }
 }
