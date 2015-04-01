@@ -18,20 +18,10 @@ class ExportSpokeJsonPlugin extends Omeka_Plugin_AbstractPlugin
 
     public function hookAdminItemsShowSidebar($args)
     {
-        $item = $args['item'];
-        $output = new Output_SpokeJson($item);
-        if ($output->rights() === 'restricted') {
-            echo get_view()->partial(
-                'export-denied-panel.php',
-                array()
-            );
-        }
-        else {
-            echo get_view()->partial(
-                'export-panel.php',
-                array()
-            );
-        }
+        echo get_view()->partial(
+            'export-panel.php',
+            array()
+        );
     }
 
     public function hookDefineRoutes($args)
