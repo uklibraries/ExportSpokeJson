@@ -77,6 +77,38 @@ class Output_SpokeJson
             'CollectionThemeR_display' => metadata($item, array('Item Type Metadata', 'Collection Theme'), array('all' => true, 'no_filter' => true)),
         );
 
+        /* Pick up related series */
+        $itemType = get_record('ItemType', array('name' => 'series'));
+        $itemTypeId = $itemType['id'];
+        $itemTypeElements = $itemType->Elements;
+        $element = NULL;
+        foreach ($itemTypeElements as $itemTypeElement) {
+            if ($itemTypeElement->name === 'Series Collection') {
+                $element = $itemTypeElement;
+                break;
+            }
+        }
+        if (isset($element)) {
+            $elementId = $element['id'];
+            $relatedItems = get_records('Item', array(
+                'advanced' => array(
+                    array(
+                        'element_id' => $elementId,
+                        'type' => 'is exactly',
+                        'terms' => metadata($item, array('Dublin Core', 'Title'), array('no_filter' => true)),
+                    )
+                )
+            ));
+            $metadata['series'] = array();
+            foreach ($relatedItems as $relatedItem) {
+                $series = array(
+                    'title' => metadata($relatedItem, array('Dublin Core', 'Title'), array('no_filter' => true)),
+                    'identifier' => metadata($relatedItem, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
+                );
+                $metadata['series'][] = $series;
+            }
+        }
+
         return $metadata;
     }
 
@@ -99,6 +131,41 @@ class Output_SpokeJson
             'SeriesSummary_display' => metadata($item, array('Item Type Metadata', 'Series Summary'), array('all' => true, 'no_filter' => true)),
             'SeriesMasterType_display' => metadata($item, array('Item Type Metadata', 'Series Master Type'), array('all' => true, 'no_filter' => true)),
         );
+
+        /* Pick up related interviews */
+        $itemType = get_record('ItemType', array('name' => 'interviews'));
+        $itemTypeId = $itemType['id'];
+        $itemTypeElements = $itemType->Elements;
+        $element = NULL;
+        foreach ($itemTypeElements as $itemTypeElement) {
+            if ($itemTypeElement->name === 'Interview Series') {
+                $element = $itemTypeElement;
+                break;
+            }
+        }
+        if (isset($element)) {
+            $elementId = $element['id'];
+            $relatedItems = get_records('Item', array(
+                'advanced' => array(
+                    array(
+                        'element_id' => $elementId,
+                        'type' => 'is exactly',
+                        'terms' => metadata($item, array('Dublin Core', 'Title'), array('no_filter' => true)),
+                    )
+                )
+            ));
+            $metadata['interviews'] = array();
+            foreach ($relatedItems as $relatedItem) {
+                $series = array(
+                    'title' => metadata($relatedItem, array('Dublin Core', 'Title'), array('no_filter' => true)),
+                    'identifier' => metadata($relatedItem, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
+                    'rights' => metadata($relatedItem, array('Dublin Core', 'Rights'), array('no_filter' => true)),
+                    'interviewee' => metadata($relatedItem, array('Item Type Metadata', 'Interviewee'), array('all' => true, 'no_filter' => true)),
+                    'interviewer' => metadata($relatedItem, array('Item Type Metadata', 'Interviewer'), array('all' => true, 'no_filter' => true)),
+                );
+                $metadata['interviews'][] = $series;
+            }
+        }
 
         return $metadata;
     }
