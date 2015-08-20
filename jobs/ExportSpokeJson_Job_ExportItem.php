@@ -18,73 +18,37 @@ class ExportSpokeJson_Job_ExportItem extends Omeka_Job_AbstractJob
         chmod($filename, fileperms($filename) | 16);
         switch ($output->itemType()) {
         case "collections":
-            $subType = 'series';
-            $subField = 'Series Collection';
-            $itemType = get_record('ItemType', array(
-                'name' => $subType,
-            ));
-            $itemTypeId = $itemType['id'];
-            $itemTypesElements = $itemType->Elements;
-            $element = NULL;
-            foreach ($itemTypesElements as $itemTypesElement) {
-                if ($itemTypesElement->name === $subField) {
-                    $element = $itemTypesElement;
-                    break;
+            $objects = get_db()->getTable('ItemRelationsRelation')->findByObjectItemId($item->id);
+            $objectRelations = array();
+            foreach ($objects as $object) {
+                if ($object->getPropertyText() !== "Is Part Of") {
+                    continue;
                 }
-            }
-            if (isset($element)) {
-                $elementId = $element['id'];
-                $relatedItems = get_records('Item', array(
-                    'advanced' => array(
-                        array(
-                            'element_id' => $elementId,
-                            'type' => 'is exactly',
-                            'terms' => $output->title(),
-                        )
+                if (!($subitem = get_record_by_id('item', $object->subject_item_id))) {
+                    continue;
+                }
+                Zend_Registry::get('bootstrap')->getResource('jobs')->sendLongRunning(
+                    'ExportSpokeJson_Job_ExportItem', array(
+                        'itemId' => $object->subject_item_id,
                     )
-                ));
-                foreach ($relatedItems as $relatedItem) {
-                    Zend_Registry::get('bootstrap')->getResource('jobs')->sendLongRunning(
-                        'ExportSpokeJson_Job_ExportItem', array(
-                            'itemId' => $relatedItem['id']
-                        )
-                    );
-                }
+                );
             }
             break;
         case "series":
-            $subType = 'interviews';
-            $subField = 'Interview Series';
-            $itemType = get_record('ItemType', array(
-                'name' => $subType,
-            ));
-            $itemTypeId = $itemType['id'];
-            $itemTypesElements = $itemType->Elements;
-            $element = NULL;
-            foreach ($itemTypesElements as $itemTypesElement) {
-                if ($itemTypesElement->name === $subField) {
-                    $element = $itemTypesElement;
-                    break;
+            $objects = get_db()->getTable('ItemRelationsRelation')->findByObjectItemId($item->id);
+            $objectRelations = array();
+            foreach ($objects as $object) {
+                if ($object->getPropertyText() !== "Is Part Of") {
+                    continue;
                 }
-            }
-            if (isset($element)) {
-                $elementId = $element['id'];
-                $relatedItems = get_records('Item', array(
-                    'advanced' => array(
-                        array(
-                            'element_id' => $elementId,
-                            'type' => 'is exactly',
-                            'terms' => $output->title(),
-                        )
+                if (!($subitem = get_record_by_id('item', $object->subject_item_id))) {
+                    continue;
+                }
+                Zend_Registry::get('bootstrap')->getResource('jobs')->sendLongRunning(
+                    'ExportSpokeJson_Job_ExportItem', array(
+                        'itemId' => $object->subject_item_id,
                     )
-                ));
-                foreach ($relatedItems as $relatedItem) {
-                    Zend_Registry::get('bootstrap')->getResource('jobs')->sendLongRunning(
-                        'ExportSpokeJson_Job_ExportItem', array(
-                            'itemId' => $relatedItem['id']
-                        )
-                    );
-                }
+                );
             }
             break;
         }

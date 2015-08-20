@@ -60,22 +60,56 @@ class Output_SpokeJson
     public function getCollectionFields()
     {
         $item = $this->_item;
+        $restriction = metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true));
         $metadata = array(
             'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
-            'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true)),
-            'format_display' => metadata($item, array('Dublin Core', 'Format'), array('all' => true, 'no_filter' => true)),
-            'CollectionExternalLinkR_display' => metadata($item, array('Item Type Metadata', 'Collection External Link'), array('all' => true, 'no_filter' => true)),
-            'CollectionKeywordR_display' => metadata($item, array('Item Type Metadata', 'Collection Keyword'), array('all' => true, 'no_filter' => true)),
-            'CollectionLCSubjectR_display' => metadata($item, array('Item Type Metadata', 'Collection LC Subject'), array('all' => true, 'no_filter' => true)),
-            'CollectionTitle_display' => metadata($item, array('Item Type Metadata', 'Collection Title'), array('all' => true, 'no_filter' => true)),
-            'CollectionSeriesR_display' => metadata($item, array('Item Type Metadata', 'Collection Series'), array('all' => true, 'no_filter' => true)),
-            'CollectionMasterType_display' => metadata($item, array('Item Type Metadata', 'Collection Master Type'), array('all' => true, 'no_filter' => true)),
-            'CollectionAccession_display' => metadata($item, array('Item Type Metadata', 'Collection Accession'), array('all' => true, 'no_filter' => true)),
-            'CollectionNumberofInterviews_display' => metadata($item, array('Item Type Metadata', 'Collection Number of Interviews'), array('all' => true, 'no_filter' => true)),
-            'CollectionDIP_display' => metadata($item, array('Item Type Metadata', 'Collection DIP'), array('all' => true, 'no_filter' => true)),
-            'CollectionSummary_display' => metadata($item, array('Item Type Metadata', 'Collection Summary'), array('all' => true, 'no_filter' => true)),
-            'CollectionThemeR_display' => metadata($item, array('Item Type Metadata', 'Collection Theme'), array('all' => true, 'no_filter' => true)),
+            'recordtype_display' => 'collection',
+            'recordtype_t' => 'collection',
+            'Restriction_t' => $restriction,
+            'CacheFile_display' => 'nil',
+            'Series_display' => 'nil',
+            'RelatedSeries_display' => array(),
+            'Keyword_display' => metadata($item, array('Item Type Metadata', 'Collection Keyword'), array('all' => true, 'no_filter' => true)),
+            'Keyword_t' => metadata($item, array('Item Type Metadata', 'Collection Keyword'), array('all' => true, 'no_filter' => true)),
+            'subject_display' => metadata($item, array('Item Type Metadata', 'Collection LC Subject'), array('all' => true, 'no_filter' => true)),
+            'subject_facet' => metadata($item, array('Item Type Metadata', 'Collection LC Subject'), array('all' => true, 'no_filter' => true)),
+            'subject_t' => metadata($item, array('Item Type Metadata', 'Collection LC Subject'), array('all' => true, 'no_filter' => true)),
+            'Material_Type_display' => metadata($item, array('Item Type Metadata', 'Collection Master Type')),
+            'Material_Type_t' => metadata($item, array('Item Type Metadata', 'Collection Master Type')),
+            'AccessionNumber_display' => metadata($item, array('Item Type Metadata', 'Collection Accession')),
+            'AccessionNumber_s' => metadata($item, array('Item Type Metadata', 'Collection Accession')),
+            'AccessionNumber_t' => metadata($item, array('Item Type Metadata', 'Collection Accession')),
+            'Collection_display' => metadata($item, array('Dublin Core', 'Title')),
+            'Collection_facet' => metadata($item, array('Dublin Core', 'Title')),
+            'title_display' => metadata($item, array('Dublin Core', 'Title')),
+            'title_t' => metadata($item, array('Dublin Core', 'Title')),
+            'title_added_entry_display' => metadata($item, array('Item Type Metadata', 'Collection Summary'), array('all' => true, 'no_filter' => true)),
+            'title_added_entry_t' => metadata($item, array('Item Type Metadata', 'Collection Summary'), array('all' => true, 'no_filter' => true)),
+            'Theme_display' => metadata($item, array('Item Type Metadata', 'Collection Theme'), array('all' => true, 'no_filter' => true)),
+            'Theme_t' => metadata($item, array('Item Type Metadata', 'Collection Theme'), array('all' => true, 'no_filter' => true)),
         );
+
+        if ($restriction === 'False') {
+            $metadata['Restriction_display'] = "No Restrictions";
+        }
+        else {
+            $metadata['Restriction_display'] = "Restrictions";
+        }
+
+        $objects = get_db()->getTable('ItemRelationsRelation')->findByObjectItemId($item->id);
+        $objectRelations = array();
+        foreach ($objects as $object) {
+            if ($object->getPropertyText() !== "Is Part Of") {
+                continue;
+            }
+            if (!($subitem = get_record_by_id('item', $object->subject_item_id))) {
+                continue;
+            }
+            $metadata['RelatedSeries_display'][] = array(
+                'id' => metadata($subitem, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
+                'label' => metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true)),
+            );
+        }
 
         return $metadata;
     }
@@ -83,22 +117,63 @@ class Output_SpokeJson
     public function getSeriesFields()
     {
         $item = $this->_item;
+        $restriction = metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true));
+        $accession_number = metadata($item, array('Item Type Metadata', 'Series Accession'));
+        $keywords = metadata($item, array('Item Type Metadata', 'Series Keyword'), array('all' => true, 'no_filter' => true));
+        $type = metadata($item, array('Item Type Metadata', 'Series Master Type'));
+        $title = metadata($item, array('Dublin Core', 'Title'));
+        $themes = metadata($item, array('Item Type Metadata', 'Series Theme'), array('all' => true, 'no_filter' => true));
+        $subjects = metadata($item, array('Item Type Metadata', 'Series LC Subject'), array('all' => true, 'no_filter' => true));
+        $summary = metadata($item, array('Item Type Metadata', 'Series Summary'), array('all' => true, 'no_filter' => true));
         $metadata = array(
             'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
-            'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true)),
-            'format_display' => metadata($item, array('Dublin Core', 'Format'), array('all' => true, 'no_filter' => true)),
-            'SeriesExternalLinkR_display' => metadata($item, array('Item Type Metadata', 'Series External Link'), array('all' => true, 'no_filter' => true)),
-            'SeriesInterviewR_display' => metadata($item, array('Item Type Metadata', 'Series Interview'), array('all' => true, 'no_filter' => true)),
-            'SeriesNumberofInterviews_display' => metadata($item, array('Item Type Metadata', 'Series Number of Interviews'), array('all' => true, 'no_filter' => true)),
-            'SeriesTitle_display' => metadata($item, array('Item Type Metadata', 'Series Title'), array('all' => true, 'no_filter' => true)),
-            'SeriesLCSubjectR_display' => metadata($item, array('Item Type Metadata', 'Series LC Subject'), array('all' => true, 'no_filter' => true)),
-            'SeriesKeywordR_display' => metadata($item, array('Item Type Metadata', 'Series Keyword'), array('all' => true, 'no_filter' => true)),
-            'SeriesThemeR_display' => metadata($item, array('Item Type Metadata', 'Series Theme'), array('all' => true, 'no_filter' => true)),
-            'SeriesAccession_display' => metadata($item, array('Item Type Metadata', 'Series Accession'), array('all' => true, 'no_filter' => true)),
-            'SeriesCollection_display' => metadata($item, array('Item Type Metadata', 'Series Collection'), array('all' => true, 'no_filter' => true)),
-            'SeriesSummary_display' => metadata($item, array('Item Type Metadata', 'Series Summary'), array('all' => true, 'no_filter' => true)),
-            'SeriesMasterType_display' => metadata($item, array('Item Type Metadata', 'Series Master Type'), array('all' => true, 'no_filter' => true)),
+            'recordtype_display' => 'series',
+            'recordtype_t' => 'series',
+            'title_display' => metadata($item, array('Dublin Core', 'Title')),
+            'title_t' => metadata($item, array('Dublin Core', 'Title')),
+            'Restriction_t' => $restriction,
+            'RelatedSeries_display' => array(),
+            'Series_display' => $title,
+            'Series_facet' => $title,
+            'subject_display' => $subjects,
+            'subject_facet' => $subjects,
+            'subject_t' => $subjects,
+            'Keyword_display' => $keywords,
+            'Keyword_t' => $keywords,
+            'Theme_display' => $themes,
+            'Theme_t' => $themes,
+            'AccessionNumber_display' => $accession_number,
+            'AccessionNumber_s' => $accession_number,
+            'AccessionNumber_t' => $accession_number,
+            'Collection_display' => metadata($item, array('Item Type Metadata', 'Series Collection')),
+            'title_added_entry_display' => $summary,
+            'title_added_entry_t' => $summary,
+            'Material_Type_display' => $type,
+            'Material_Type_t' => $type,
+            'CacheFile_display' => 'nil',
         );
+
+        if ($restriction === 'False') {
+            $metadata['Restriction_display'] = "No Restrictions";
+        }
+        else {
+            $metadata['Restriction_display'] = "Restrictions";
+        }
+
+        $objects = get_db()->getTable('ItemRelationsRelation')->findByObjectItemId($item->id);
+        $objectRelations = array();
+        foreach ($objects as $object) {
+            if ($object->getPropertyText() !== "Is Part Of") {
+                continue;
+            }
+            if (!($subitem = get_record_by_id('item', $object->subject_item_id))) {
+                continue;
+            }
+            $metadata['RelatedSeries_display'][] = array(
+                'id' => metadata($subitem, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
+                'label' => metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true)),
+            );
+        }
 
         return $metadata;
     }
@@ -106,35 +181,77 @@ class Output_SpokeJson
     public function getInterviewFields()
     {
         $item = $this->_item;
+        $restriction = metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true));
+        $accession = metadata($item, array('Dublin Core', 'Identifier'));
+        $subjects = metadata($item, array('Item Type Metadata', 'Interview LC Subject'), array('all' => true, 'no_filter' => true));
+        $keywords = metadata($item, array('Item Type Metadata', 'Interview Keyword'), array('all' => true, 'no_filter' => true));
+        $summary = metadata($item, array('Item Type Metadata', 'Interview Summary'), array('all' => true, 'no_filter' => true));
+        $title = metadata($item, array('Dublin Core', 'Title'));
+
+        $interviewees = $this->getNames(metadata($item, array('Item Type Metadata', 'Interviewee Name'), array('all' => true, 'no_filter' => true)));
+        $interviewers = $this->getNames(metadata($item, array('Item Type Metadata', 'Interviewer Name'), array('all' => true, 'no_filter' => true)));
+
         $metadata = array(
             'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
-            'IntervieweeR_display' => metadata($item, array('Item Type Metadata', 'Interviewee'), array('all' => true, 'no_filter' => true)),
-            'InterviewerR_display' => metadata($item, array('Item Type Metadata', 'Interviewer'), array('all' => true, 'no_filter' => true)),
-            'InterviewAccessionNumber_display' => metadata($item, array('Item Type Metadata', 'Interview Accession Number'), array('all' => true, 'no_filter' => true)),
-            'InterviewCollection_display' => metadata($item, array('Item Type Metadata', 'Interview Collection'), array('all' => true, 'no_filter' => true)),
-            'InterviewSeries_display' => metadata($item, array('Item Type Metadata', 'Interview Series'), array('all' => true, 'no_filter' => true)),
-            'InterviewTitle_display' => metadata($item, array('Item Type Metadata', 'Interview Title'), array('all' => true, 'no_filter' => true)),
-            'InterviewDate_display' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
+            'recordtype_display' => 'interview',
+            'recordtype_t' => 'interview',
+            'Restriction_t' => $restriction,
+            'Interviewee_display' => $interviewees,
+            'Interviewee_t' => $interviewees,
+            'author_display' => $interviewees,
+            'author_facet' => $interviewees,
+            'author_t' => $interviewees,
+            'Interviewer_display' => $interviewers,
+            'Interviewer_t' => $interviewers,
+            'AccessionNumber_display' => $accession,
+            'AccessionNumber_s' => $accession,
+            'AccessionNumber_t' => $accession,
+            'Collection_display' => 'nil',
+            'RelatedSeries_display' => array(),
+            'subject_display' => $subjects,
+            'subject_facet' => $subjects,
+            'subject_t' => $subjects,
+            'title_added_entry_display' => $summary,
+            'title_added_entry_t' => $summary,
+            'title_display' => $title,
+            'title_t' => $title,
+            'Date_display' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
         );
-        if ($this->rights() === "unrestricted") {
+        if ($this->rights() === "False") {
             $metadata = array_merge($metadata, array(
-                'rights_display' => metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true)),
-                'format_display' => metadata($item, array('Dublin Core', 'Format'), array('all' => true, 'no_filter' => true)),
-                'InterviewUsageStatement_display' => metadata($item, array('Item Type Metadata', 'Interview Usage Statement'), array('all' => true, 'no_filter' => true)),
-                'InterviewExternalLinkR_display' => metadata($item, array('Item Type Metadata', 'Interview External Link'), array('all' => true, 'no_filter' => true)),
-                'InterviewYear_display' => metadata($item, array('Item Type Metadata', 'Interview Year'), array('all' => true, 'no_filter' => true)),
-                'InterviewRestrictionDetails_display' => metadata($item, array('Item Type Metadata', 'Interview Restriction Details'), array('all' => true, 'no_filter' => true)),
-                'InterviewMonth_display' => metadata($item, array('Item Type Metadata', 'Interview Month'), array('all' => true, 'no_filter' => true)),
-                'InterviewCacheFile_display' => metadata($item, array('Item Type Metadata', 'Interview Cache File'), array('all' => true, 'no_filter' => true)),
-                'InterviewKeywordsR_display' => metadata($item, array('Item Type Metadata', 'Interview Keywords'), array('all' => true, 'no_filter' => true)),
-                'InterviewDay_display' => metadata($item, array('Item Type Metadata', 'Interview Day'), array('all' => true, 'no_filter' => true)),
-                'UseRestrictions_display' => metadata($item, array('Item Type Metadata', 'Use Restrictions'), array('all' => true, 'no_filter' => true)),
-                'OnlineIdentifier_display' => metadata($item, array('Item Type Metadata', 'Online Identifier'), array('all' => true, 'no_filter' => true)),
-                'InterviewMasterType_display' => metadata($item, array('Item Type Metadata', 'Interview Master Type'), array('all' => true, 'no_filter' => true)),
-                'InterviewRightsStatement_display' => metadata($item, array('Item Type Metadata', 'Interview Rights Statement'), array('all' => true, 'no_filter' => true)),
-                'InterviewLCSubjectR_display' => metadata($item, array('Item Type Metadata', 'Interview LC Subject'), array('all' => true, 'no_filter' => true)),
+                'CacheFile_display' => metadata($item, array('Item Type Metadata', 'Interview Cache File')),
+                'Keyword_display' => $keywords,
+                'Keyword_t' => $keywords,
+                'Material_Type_display' => 'nil',
+                'Material_Type_t' => 'nil',
             ));
         }
+
+        if ($restriction === 'False') {
+            $metadata['Restriction_display'] = "No Restrictions";
+        }
+        else {
+            $metadata['Restriction_display'] = "Restrictions";
+        }
+
+        $relatedSeries = array();
+        $subjects = get_db()->getTable('ItemRelationsRelation')->findBySubjectItemId($item->id);
+        $subjectRelations = array();
+        foreach ($subjects as $subject) {
+            if ($subject->getPropertyText() !== "Is Part Of") {
+                continue;
+            }
+            if (!($subitem = get_record_by_id('item', $subject->object_item_id))) {
+                continue;
+            }
+            $label = metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true));
+            $metadata['RelatedSeries_display'][] = array(
+                'id' => metadata($subitem, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
+                'label' => $label,
+            );
+            $relatedSeries[] = $label;
+        }
+        $metadata['Series_display'] = implode('', $relatedSeries);
 
         return $metadata;
     }
@@ -142,6 +259,22 @@ class Output_SpokeJson
     public function toJson()
     {
         return json_encode($this->_metadata);
+    }
+
+    public function getNames($list) {
+        $people = array();
+        $keys = array('first', 'middle', 'last');
+        foreach ($list as $text) {
+            $person = json_decode(str_replace('&quot;', '"', $text), true);
+            $pieces = array();
+            foreach ($keys as $key) {
+                if (isset($person[$key]) and strlen($person[$key]) > 0) {
+                    $pieces[] = $person[$key];
+                }
+            }
+            $people[] = implode(' ', $pieces);
+        }
+        return $people;
     }
 
     private $_metadata;
