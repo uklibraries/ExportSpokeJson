@@ -50,6 +50,7 @@ class Output_SpokeJson
         switch($this->_itemType) {
         case "collections":
             $raw_suppression = metadata($this->_item, array('Item Type Metadata', 'Collection Suppressed'), array('no_filter' => true));
+            $raw_suppression = str_replace('&quot;', '"', $raw_suppression);
             $suppression = json_decode($raw_suppression, true);
             $exportable = $suppression['description'] ? false : true;
             break;
@@ -63,6 +64,7 @@ class Output_SpokeJson
                 $exportable = true;
                 foreach ($this->parents() as $parent) {
                     $parent_raw_suppression = metadata($parent, array('Item Type Metadata', 'Collection Suppressed'), array('no_filter' => true));
+                    $parent_raw_suppression = str_replace('&quot;', '"', $parent_raw_suppression);
                     $parent_suppression = json_decode($parent_raw_suppression, true);
                     if ($parent_suppression['recursive']) {
                         $exportable = false;
@@ -79,6 +81,7 @@ class Output_SpokeJson
                 $exportable = true;
                 foreach ($this->parents() as $parent) {
                     $parent_raw_suppression = metadata($parent, array('Item Type Metadata', 'Series Suppressed'), array('no_filter' => true));
+                    $parent_raw_suppression = str_replace('&quot;', '"', $parent_raw_suppression);
                     $parent_suppression = json_decode($parent_raw_suppression, true);
                     if ($parent_suppression['recursive']) {
                         $exportable = false;
@@ -87,6 +90,7 @@ class Output_SpokeJson
                         $parentOutput = new Output_SpokeJson($parent);
                         foreach ($parentOutput->parents() as $grandparent) {
                             $grandparent_raw_suppression = metadata($grandparent, array('Item Type Metadata', 'Collection Suppressed'), array('no_filter' => true));
+                            $grandparent_raw_suppression = str_replace('&quot;', '"', $grandparent_raw_suppression);
                             $grandparent_suppression = json_decode($grandparent_raw_suppression, true);
                             if ($grandparent_suppression['recursive']) {
                                 $exportable = false;
