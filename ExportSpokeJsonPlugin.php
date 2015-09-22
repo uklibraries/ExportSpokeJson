@@ -7,8 +7,11 @@
  * @package Omeka\Plugins\ExportSpokeJson
  */
 
-require_once "jobs" . DIRECTORY_SEPARATOR . "ExportSpokeJson_Job_ExportItem.php";
-require_once "models" . DIRECTORY_SEPARATOR . "Output" . DIRECTORY_SEPARATOR . "SpokeJson.php";
+define('DS', DIRECTORY_SEPARATOR);
+require_once "jobs" . DS . "ExportSpokeJson_Job_ExportItem.php";
+require_once "models" . DS . "Output" . DIRECTORY_SEPARATOR . "SpokeJson.php";
+$pluginDir = dirname(dirname(__FILE__));
+require_once $pluginDir . DS . "RecursiveSuppression" . DS . "models" . DS . "SuppressionChecker.php";
 
 class ExportSpokeJsonPlugin extends Omeka_Plugin_AbstractPlugin
 {
@@ -20,8 +23,8 @@ class ExportSpokeJsonPlugin extends Omeka_Plugin_AbstractPlugin
     public function hookAdminItemsShowSidebar($args)
     {
         $item = get_record_by_id('Item', $args['item']['id']);
-        $output = new Output_SpokeJson($item);
-        if ($output->exportable()) {
+        $checker = new SuppressionChecker($item);
+        if ($checker->exportable()) {
             echo get_view()->partial(
                 'export-panel.php',
                 array()
