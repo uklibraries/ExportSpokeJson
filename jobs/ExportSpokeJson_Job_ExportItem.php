@@ -21,10 +21,10 @@ class ExportSpokeJson_Job_ExportItem extends Omeka_Job_AbstractJob
 
         if ($checker->exportable()) {
             $output = new Output_SpokeJson($item);
-            $filename = $path . DIRECTORY_SEPARATOR . $output->id() . '.json';
+            $filename = $path . DIRECTORY_SEPARATOR . $output->ark() . '.json';
             file_put_contents($filename, $output->toJSON());
             chmod($filename, fileperms($filename) | 16);
-            $export_filename = $export_path . DIRECTORY_SEPARATOR . $output->id() . '.json';
+            $export_filename = $export_path . DIRECTORY_SEPARATOR . $output->ark() . '.json';
             rename($filename, $export_filename);
             switch ($output->itemType()) {
             case "collections":

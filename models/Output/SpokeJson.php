@@ -14,7 +14,7 @@ class Output_SpokeJson
         $this->_item = $item;
         $metadata = array();
         $this->_itemType = $item->getItemType()->name;
-        switch($this->_itemType) {
+        switch ($this->_itemType) {
         case "collections":
             $metadata = $this->getCollectionFields();
             break;
@@ -44,6 +44,24 @@ class Output_SpokeJson
         return $this->_id;
     }
 
+    public function ark()
+    {
+        if (!isset($this->_ark)) {
+            switch ($this->_itemType) {
+            case "collections":
+                $this->_ark = metadata($this->_item, array('Item Type Metadata', 'Collection ARK Identifier'), array('no_filter' => true));
+                break;
+            case "series":
+                $this->_ark = metadata($this->_item, array('Item Type Metadata', 'Series ARK Identifier'), array('no_filter' => true));
+                break;
+            case "interviews":
+                $this->_ark = metadata($this->_item, array('Item Type Metadata', 'Interview ARK Identifier'), array('no_filter' => true));
+                break;
+            }
+        }
+        return $this->_ark;
+    }
+
     public function title()
     {
         if (!isset($this->_title)) {
@@ -62,7 +80,7 @@ class Output_SpokeJson
         $item = $this->_item;
         $restriction = metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true));
         $metadata = array(
-            'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
+            'id' => $this->ark(),
             'recordtype_display' => 'collection',
             'recordtype_t' => 'collection',
             'Restriction_t' => $restriction,
@@ -106,7 +124,7 @@ class Output_SpokeJson
                 continue;
             }
             $metadata['RelatedSeries_display'][] = array(
-                'id' => metadata($subitem, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
+                'id' => metadata($subitem, array('Item Type Metadata', 'Series ARK Identifier'), array('no_filter' => true)),
                 'label' => metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true)),
             );
         }
@@ -126,7 +144,7 @@ class Output_SpokeJson
         $subjects = metadata($item, array('Item Type Metadata', 'Series LC Subject'), array('all' => true, 'no_filter' => true));
         $summary = metadata($item, array('Item Type Metadata', 'Series Summary'), array('all' => true, 'no_filter' => true));
         $metadata = array(
-            'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
+            'id' => $this->ark(),
             'recordtype_display' => 'series',
             'recordtype_t' => 'series',
             'title_display' => metadata($item, array('Dublin Core', 'Title')),
@@ -170,7 +188,7 @@ class Output_SpokeJson
                 continue;
             }
             $metadata['RelatedSeries_display'][] = array(
-                'id' => metadata($subitem, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
+                'id' => metadata($subitem, array('Item Type Metadata', 'Interview ARK Identifier'), array('no_filter' => true)),
                 'label' => metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true)),
             );
         }
@@ -193,7 +211,7 @@ class Output_SpokeJson
 
         if ($restriction === "False") {
             $metadata = array(
-                'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
+                'id' => $this->ark(),
                 'recordtype_display' => 'interview',
                 'recordtype_t' => 'interview',
                 'Restriction_t' => $restriction,
@@ -229,7 +247,7 @@ class Output_SpokeJson
         }
         else {
             $metadata = array(
-                'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
+                'id' => $this->ark(),
                 'recordtype_display' => 'interview',
                 'recordtype_t' => 'interview',
                 'Restriction_t' => $restriction,
@@ -268,7 +286,7 @@ class Output_SpokeJson
             }
             $label = metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true));
             $metadata['RelatedSeries_display'][] = array(
-                'id' => metadata($subitem, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
+                'id' => metadata($subitem, array('Item Type Metadata', 'Series ARK Identifier'), array('no_filter' => true)),
                 'label' => $label,
             );
             $relatedSeries[] = $label;
