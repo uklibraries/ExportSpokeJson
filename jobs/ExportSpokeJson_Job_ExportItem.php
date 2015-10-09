@@ -15,6 +15,7 @@ class ExportSpokeJson_Job_ExportItem extends Omeka_Job_AbstractJob
     public function perform()
     {
         $path = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'tmp';
+        $export_path = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'exports';
         $item = get_record_by_id('Item', $this->_options['itemId']);
         $checker = new SuppressionChecker($item);
 
@@ -23,6 +24,8 @@ class ExportSpokeJson_Job_ExportItem extends Omeka_Job_AbstractJob
             $filename = $path . DIRECTORY_SEPARATOR . $output->id() . '.json';
             file_put_contents($filename, $output->toJSON());
             chmod($filename, fileperms($filename) | 16);
+            $export_filename = $export_path . DIRECTORY_SEPARATOR . $output->id() . '.json';
+            rename($filename, $export_filename);
             switch ($output->itemType()) {
             case "collections":
                 $objects = get_db()->getTable('ItemRelationsRelation')->findByObjectItemId($item->id);
