@@ -191,44 +191,68 @@ class Output_SpokeJson
         $interviewees = $this->getNames(metadata($item, array('Item Type Metadata', 'Interviewee Name'), array('all' => true, 'no_filter' => true)));
         $interviewers = $this->getNames(metadata($item, array('Item Type Metadata', 'Interviewer Name'), array('all' => true, 'no_filter' => true)));
 
-        $metadata = array(
-            'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
-            'recordtype_display' => 'interview',
-            'recordtype_t' => 'interview',
-            'Restriction_t' => $restriction,
-            'Interviewee_display' => $interviewees,
-            'Interviewee_t' => $interviewees,
-            'author_display' => $interviewees,
-            'author_facet' => $interviewees,
-            'author_t' => $interviewees,
-            'Interviewer_display' => $interviewers,
-            'Interviewer_t' => $interviewers,
-            'AccessionNumber_display' => $accession,
-            'AccessionNumber_s' => $accession,
-            'AccessionNumber_t' => $accession,
-            'Collection_display' => 'nil',
-            'RelatedSeries_display' => array(),
-            'subject_display' => $subjects,
-            'subject_facet' => $subjects,
-            'subject_t' => $subjects,
-            'title_added_entry_display' => $summary,
-            'title_added_entry_t' => $summary,
-            'title_display' => $title,
-            'title_t' => $title,
-            'Date_display' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
-        );
-        $metadata = array_merge($metadata, array(
-            'CacheFile_display' => metadata($item, array('Item Type Metadata', 'Interview Cache File')),
-            'Keyword_display' => $keywords,
-            'Keyword_t' => $keywords,
-            'Material_Type_display' => 'nil',
-            'Material_Type_t' => 'nil',
-        ));
-
-        if ($restriction === 'False') {
+        if ($restriction === "False") {
+            $metadata = array(
+                'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
+                'recordtype_display' => 'interview',
+                'recordtype_t' => 'interview',
+                'Restriction_t' => $restriction,
+                'Interviewee_display' => $interviewees,
+                'Interviewee_t' => $interviewees,
+                'author_display' => $interviewees,
+                'author_facet' => $interviewees,
+                'author_t' => $interviewees,
+                'Interviewer_display' => $interviewers,
+                'Interviewer_t' => $interviewers,
+                'AccessionNumber_display' => $accession,
+                'AccessionNumber_s' => $accession,
+                'AccessionNumber_t' => $accession,
+                'Collection_display' => 'nil',
+                'RelatedSeries_display' => array(),
+                'subject_display' => $subjects,
+                'subject_facet' => $subjects,
+                'subject_t' => $subjects,
+                'title_added_entry_display' => $summary,
+                'title_added_entry_t' => $summary,
+                'title_display' => $title,
+                'title_t' => $title,
+                'Date_display' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
+            );
+            $metadata = array_merge($metadata, array(
+                'CacheFile_display' => metadata($item, array('Item Type Metadata', 'Interview Cache File')),
+                'Keyword_display' => $keywords,
+                'Keyword_t' => $keywords,
+                'Material_Type_display' => 'nil',
+                'Material_Type_t' => 'nil',
+            ));
             $metadata['Restriction_display'] = "No Restrictions";
         }
         else {
+            $metadata = array(
+                'id' => metadata($item, array('Dublin Core', 'Identifier'), array('no_filter' => true)),
+                'recordtype_display' => 'interview',
+                'recordtype_t' => 'interview',
+                'Restriction_t' => $restriction,
+                'Interviewee_display' => $interviewees,
+                'Interviewee_t' => $interviewees,
+                'author_display' => $interviewees,
+                'author_facet' => $interviewees,
+                'author_t' => $interviewees,
+                'Interviewer_display' => $interviewers,
+                'Interviewer_t' => $interviewers,
+                'AccessionNumber_display' => $accession,
+                'AccessionNumber_s' => $accession,
+                'AccessionNumber_t' => $accession,
+                'Collection_display' => 'nil',
+                'RelatedSeries_display' => array(),
+                'title_display' => $title,
+                'title_t' => $title,
+                'Date_display' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
+            );
+            $metadata = array_merge($metadata, array(
+                'Material_Type_display' => 'nil',
+                'Material_Type_t' => 'nil',
+            ));
             $metadata['Restriction_display'] = "Restrictions";
         }
 
