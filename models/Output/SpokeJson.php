@@ -6,6 +6,10 @@
  * @license http://opensource.org/licenses/MIT MIT
  * @package Omeka\Plugins\ExportSpokeJson */
 
+define('DS', DIRECTORY_SEPARATOR);
+$pluginDir = dirname(dirname(dirname(dirname(__FILE__))));
+require_once $pluginDir . DS . "RecursiveSuppression" . DS . "models" . DS . "SuppressionChecker.php";
+
 class Output_SpokeJson
 {
     public function __construct($item)
@@ -123,10 +127,13 @@ class Output_SpokeJson
             if (!($subitem = get_record_by_id('item', $object->subject_item_id))) {
                 continue;
             }
-            $metadata['RelatedSeries_display'][] = array(
-                'id' => metadata($subitem, array('Item Type Metadata', 'Series ARK Identifier'), array('no_filter' => true)),
-                'label' => metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true)),
-            );
+            $checker = new SuppressionChecker($subitem);
+            if ($checker->exportable()) {
+                $metadata['RelatedSeries_display'][] = array(
+                    'id' => metadata($subitem, array('Item Type Metadata', 'Series ARK Identifier'), array('no_filter' => true)),
+                    'label' => metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true)),
+                );
+            }
         }
 
         return $metadata;
@@ -187,10 +194,13 @@ class Output_SpokeJson
             if (!($subitem = get_record_by_id('item', $object->subject_item_id))) {
                 continue;
             }
-            $metadata['RelatedSeries_display'][] = array(
-                'id' => metadata($subitem, array('Item Type Metadata', 'Interview ARK Identifier'), array('no_filter' => true)),
-                'label' => metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true)),
-            );
+            $checker = new SuppressionChecker($subitem);
+            if ($checker->exportable()) {
+                $metadata['RelatedSeries_display'][] = array(
+                    'id' => metadata($subitem, array('Item Type Metadata', 'Interview ARK Identifier'), array('no_filter' => true)),
+                    'label' => metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true)),
+                );
+            }
         }
 
         return $metadata;
@@ -284,12 +294,15 @@ class Output_SpokeJson
             if (!($subitem = get_record_by_id('item', $subject->object_item_id))) {
                 continue;
             }
-            $label = metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true));
-            $metadata['RelatedSeries_display'][] = array(
-                'id' => metadata($subitem, array('Item Type Metadata', 'Series ARK Identifier'), array('no_filter' => true)),
-                'label' => $label,
-            );
-            $relatedSeries[] = $label;
+            $checker = new SuppressionChecker($subitem);
+            if ($checker->exportable()) {
+                $label = metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true));
+                $metadata['RelatedSeries_display'][] = array(
+                    'id' => metadata($subitem, array('Item Type Metadata', 'Series ARK Identifier'), array('no_filter' => true)),
+                    'label' => $label,
+                );
+                $relatedSeries[] = $label;
+            }
         }
         $metadata['Series_display'] = implode('', $relatedSeries);
 
