@@ -87,35 +87,33 @@ class Output_SpokeJson
             'id' => $this->ark(),
             'recordtype_display' => 'collection',
             'recordtype_t' => 'collection',
-            'Restriction_t' => $restriction,
-            'CacheFile_display' => 'nil',
-            'Series_display' => 'nil',
-            'RelatedSeries_display' => array(),
-            'Keyword_display' => metadata($item, array('Item Type Metadata', 'Collection Keyword'), array('all' => true, 'no_filter' => true)),
-            'Keyword_t' => metadata($item, array('Item Type Metadata', 'Collection Keyword'), array('all' => true, 'no_filter' => true)),
+            'restriction_t' => $restriction,
+            'related_series_display' => array(),
+            'keyword_display' => metadata($item, array('Item Type Metadata', 'Collection Keyword'), array('all' => true, 'no_filter' => true)),
+            'keyword_t' => metadata($item, array('Item Type Metadata', 'Collection Keyword'), array('all' => true, 'no_filter' => true)),
             'subject_display' => metadata($item, array('Item Type Metadata', 'Collection LC Subject'), array('all' => true, 'no_filter' => true)),
             'subject_facet' => metadata($item, array('Item Type Metadata', 'Collection LC Subject'), array('all' => true, 'no_filter' => true)),
             'subject_t' => metadata($item, array('Item Type Metadata', 'Collection LC Subject'), array('all' => true, 'no_filter' => true)),
-            'Material_Type_display' => metadata($item, array('Item Type Metadata', 'Collection Master Type')),
-            'Material_Type_t' => metadata($item, array('Item Type Metadata', 'Collection Master Type')),
-            'AccessionNumber_display' => metadata($item, array('Item Type Metadata', 'Collection Accession')),
-            'AccessionNumber_s' => metadata($item, array('Item Type Metadata', 'Collection Accession')),
-            'AccessionNumber_t' => metadata($item, array('Item Type Metadata', 'Collection Accession')),
-            'Collection_display' => metadata($item, array('Dublin Core', 'Title')),
-            'Collection_facet' => metadata($item, array('Dublin Core', 'Title')),
+            'material_type_display' => metadata($item, array('Item Type Metadata', 'Collection Master Type')),
+            'material_type_t' => metadata($item, array('Item Type Metadata', 'Collection Master Type')),
+            'accession_number_display' => metadata($item, array('Item Type Metadata', 'Collection Accession')),
+            'accession_number_s' => metadata($item, array('Item Type Metadata', 'Collection Accession')),
+            'accession_number_t' => metadata($item, array('Item Type Metadata', 'Collection Accession')),
+            'collection_display' => metadata($item, array('Dublin Core', 'Title')),
+            'collection_facet' => metadata($item, array('Dublin Core', 'Title')),
             'title_display' => metadata($item, array('Dublin Core', 'Title')),
             'title_t' => metadata($item, array('Dublin Core', 'Title')),
             'title_added_entry_display' => metadata($item, array('Item Type Metadata', 'Collection Summary'), array('all' => true, 'no_filter' => true)),
             'title_added_entry_t' => metadata($item, array('Item Type Metadata', 'Collection Summary'), array('all' => true, 'no_filter' => true)),
-            'Theme_display' => metadata($item, array('Item Type Metadata', 'Collection Theme'), array('all' => true, 'no_filter' => true)),
-            'Theme_t' => metadata($item, array('Item Type Metadata', 'Collection Theme'), array('all' => true, 'no_filter' => true)),
+            'theme_display' => metadata($item, array('Item Type Metadata', 'Collection Theme'), array('all' => true, 'no_filter' => true)),
+            'theme_t' => metadata($item, array('Item Type Metadata', 'Collection Theme'), array('all' => true, 'no_filter' => true)),
         );
 
         if ($restriction === 'False') {
-            $metadata['Restriction_display'] = "No Restrictions";
+            $metadata['restriction_display'] = "No Restrictions";
         }
         else {
-            $metadata['Restriction_display'] = "Restrictions";
+            $metadata['restriction_display'] = "Restrictions";
         }
 
         $objects = get_db()->getTable('ItemRelationsRelation')->findByObjectItemId($item->id);
@@ -129,7 +127,7 @@ class Output_SpokeJson
             }
             $checker = new SuppressionChecker($subitem);
             if ($checker->exportable()) {
-                $metadata['RelatedSeries_display'][] = array(
+                $metadata['related_series_display'][] = array(
                     'id' => metadata($subitem, array('Item Type Metadata', 'Series ARK Identifier'), array('no_filter' => true)),
                     'label' => metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true)),
                 );
@@ -156,33 +154,31 @@ class Output_SpokeJson
             'recordtype_t' => 'series',
             'title_display' => metadata($item, array('Dublin Core', 'Title')),
             'title_t' => metadata($item, array('Dublin Core', 'Title')),
-            'Restriction_t' => $restriction,
-            'RelatedSeries_display' => array(),
-            'Series_display' => $title,
-            'Series_facet' => $title,
+            'restriction_t' => $restriction,
+            'related_series_display' => array(),
+            'series_display' => $title,
+            'series_facet' => $title,
             'subject_display' => $subjects,
             'subject_facet' => $subjects,
             'subject_t' => $subjects,
-            'Keyword_display' => $keywords,
-            'Keyword_t' => $keywords,
-            'Theme_display' => $themes,
-            'Theme_t' => $themes,
-            'AccessionNumber_display' => $accession_number,
-            'AccessionNumber_s' => $accession_number,
-            'AccessionNumber_t' => $accession_number,
-            'Collection_display' => metadata($item, array('Item Type Metadata', 'Series Collection')),
+            'keyword_display' => $keywords,
+            'keyword_t' => $keywords,
+            'theme_display' => $themes,
+            'theme_t' => $themes,
+            'accession_number_display' => $accession_number,
+            'accession_number_s' => $accession_number,
+            'accession_number_t' => $accession_number,
             'title_added_entry_display' => $summary,
             'title_added_entry_t' => $summary,
-            'Material_Type_display' => $type,
-            'Material_Type_t' => $type,
-            'CacheFile_display' => 'nil',
+            'material_type_display' => $type,
+            'material_type_t' => $type,
         );
 
         if ($restriction === 'False') {
-            $metadata['Restriction_display'] = "No Restrictions";
+            $metadata['restriction_display'] = "No Restrictions";
         }
         else {
-            $metadata['Restriction_display'] = "Restrictions";
+            $metadata['restriction_display'] = "Restrictions";
         }
 
         $objects = get_db()->getTable('ItemRelationsRelation')->findByObjectItemId($item->id);
@@ -196,12 +192,29 @@ class Output_SpokeJson
             }
             $checker = new SuppressionChecker($subitem);
             if ($checker->exportable()) {
-                $metadata['RelatedSeries_display'][] = array(
+                $metadata['related_series_display'][] = array(
                     'id' => metadata($subitem, array('Item Type Metadata', 'Interview ARK Identifier'), array('no_filter' => true)),
                     'label' => metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true)),
                 );
             }
         }
+
+        $relatedCollections = array();
+        $subjects = get_db()->getTable('ItemRelationsRelation')->findBySubjectItemId($item->id);
+        $subjectRelations = array();
+        foreach ($subjects as $subject) {
+            if ($subject->getPropertyText() !== "Is Part Of") {
+                continue;
+            }
+            if (!($subitem = get_record_by_id('item', $subject->object_item_id))) {
+                continue;
+            }
+            $checker = new SuppressionChecker($subitem);
+            if ($checker->exportable()) {
+                $relatedCollections[] = metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true));
+            }
+        }
+        $metadata['collection_display'] = implode('', $relatedCollections);
 
         return $metadata;
     }
@@ -224,19 +237,18 @@ class Output_SpokeJson
                 'id' => $this->ark(),
                 'recordtype_display' => 'interview',
                 'recordtype_t' => 'interview',
-                'Restriction_t' => $restriction,
-                'Interviewee_display' => $interviewees,
-                'Interviewee_t' => $interviewees,
+                'restriction_t' => $restriction,
+                'interviewee_display' => $interviewees,
+                'interviewee_t' => $interviewees,
                 'author_display' => $interviewees,
                 'author_facet' => $interviewees,
                 'author_t' => $interviewees,
-                'Interviewer_display' => $interviewers,
-                'Interviewer_t' => $interviewers,
-                'AccessionNumber_display' => $accession,
-                'AccessionNumber_s' => $accession,
-                'AccessionNumber_t' => $accession,
-                'Collection_display' => 'nil',
-                'RelatedSeries_display' => array(),
+                'interviewer_display' => $interviewers,
+                'interviewer_t' => $interviewers,
+                'accession_number_display' => $accession,
+                'accession_number_s' => $accession,
+                'accession_number_t' => $accession,
+                'related_series_display' => array(),
                 'subject_display' => $subjects,
                 'subject_facet' => $subjects,
                 'subject_t' => $subjects,
@@ -244,44 +256,37 @@ class Output_SpokeJson
                 'title_added_entry_t' => $summary,
                 'title_display' => $title,
                 'title_t' => $title,
-                'Date_display' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
+                'date_display' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
             );
             $metadata = array_merge($metadata, array(
-                'CacheFile_display' => metadata($item, array('Item Type Metadata', 'Interview Cache File')),
-                'Keyword_display' => $keywords,
-                'Keyword_t' => $keywords,
-                'Material_Type_display' => 'nil',
-                'Material_Type_t' => 'nil',
+                'cachefile_display' => metadata($item, array('Item Type Metadata', 'Interview Cache File')),
+                'keyword_display' => $keywords,
+                'keyword_t' => $keywords,
             ));
-            $metadata['Restriction_display'] = "No Restrictions";
+            $metadata['restriction_display'] = "No Restrictions";
         }
         else {
             $metadata = array(
                 'id' => $this->ark(),
                 'recordtype_display' => 'interview',
                 'recordtype_t' => 'interview',
-                'Restriction_t' => $restriction,
-                'Interviewee_display' => $interviewees,
-                'Interviewee_t' => $interviewees,
+                'restriction_t' => $restriction,
+                'interviewee_display' => $interviewees,
+                'interviewee_t' => $interviewees,
                 'author_display' => $interviewees,
                 'author_facet' => $interviewees,
                 'author_t' => $interviewees,
-                'Interviewer_display' => $interviewers,
-                'Interviewer_t' => $interviewers,
-                'AccessionNumber_display' => $accession,
-                'AccessionNumber_s' => $accession,
-                'AccessionNumber_t' => $accession,
-                'Collection_display' => 'nil',
-                'RelatedSeries_display' => array(),
+                'interviewer_display' => $interviewers,
+                'interviewer_t' => $interviewers,
+                'accession_number_display' => $accession,
+                'accession_number_s' => $accession,
+                'accession_number_t' => $accession,
+                'related_series_display' => array(),
                 'title_display' => $title,
                 'title_t' => $title,
-                'Date_display' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
+                'date_display' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
             );
-            $metadata = array_merge($metadata, array(
-                'Material_Type_display' => 'nil',
-                'Material_Type_t' => 'nil',
-            ));
-            $metadata['Restriction_display'] = "Restrictions";
+            $metadata['restriction_display'] = "Restrictions";
         }
 
         $relatedSeries = array();
@@ -297,14 +302,14 @@ class Output_SpokeJson
             $checker = new SuppressionChecker($subitem);
             if ($checker->exportable()) {
                 $label = metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true));
-                $metadata['RelatedSeries_display'][] = array(
+                $metadata['related_series_display'][] = array(
                     'id' => metadata($subitem, array('Item Type Metadata', 'Series ARK Identifier'), array('no_filter' => true)),
                     'label' => $label,
                 );
                 $relatedSeries[] = $label;
             }
         }
-        $metadata['Series_display'] = implode('', $relatedSeries);
+        $metadata['series_display'] = implode('', $relatedSeries);
 
         return $metadata;
     }
