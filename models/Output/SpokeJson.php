@@ -10,6 +10,9 @@ define('DS', DIRECTORY_SEPARATOR);
 $pluginDir = dirname(dirname(dirname(dirname(__FILE__))));
 require_once $pluginDir . DS . "RecursiveSuppression" . DS . "models" . DS . "SuppressionChecker.php";
 
+define('LAST_FIRST_MIDDLE', 1);
+define('FIRST_MIDDLE_LAST', 2);
+
 class Output_SpokeJson
 {
     public function __construct($item)
@@ -133,6 +136,7 @@ class Output_SpokeJson
                 );
             }
         }
+        $metadata['related_series_t'] = $metadata['related_series_display'];
 
         return $metadata;
     }
@@ -198,6 +202,7 @@ class Output_SpokeJson
                 );
             }
         }
+        $metadata['related_series_t'] = $metadata['related_series_display'];
 
         $relatedCollections = array();
         $subjects = get_db()->getTable('ItemRelationsRelation')->findBySubjectItemId($item->id);
@@ -215,6 +220,7 @@ class Output_SpokeJson
             }
         }
         $metadata['collection_display'] = implode('', $relatedCollections);
+        $metadata['collection_facet'] = $metadata['collection_display'];
 
         return $metadata;
     }
@@ -229,7 +235,8 @@ class Output_SpokeJson
         $summary = metadata($item, array('Item Type Metadata', 'Interview Summary'), array('all' => true, 'no_filter' => true));
         $title = metadata($item, array('Dublin Core', 'Title'));
 
-        $interviewees = $this->getNames(metadata($item, array('Item Type Metadata', 'Interviewee Name'), array('all' => true, 'no_filter' => true)));
+        $interviewees_lfm = $this->getNames(metadata($item, array('Item Type Metadata', 'Interviewee Name'), array('all' => true, 'no_filter' => true)), LAST_FIRST_MIDDLE);
+        $interviewees_fml = $this->getNames(metadata($item, array('Item Type Metadata', 'Interviewee Name'), array('all' => true, 'no_filter' => true)));
         $interviewers = $this->getNames(metadata($item, array('Item Type Metadata', 'Interviewer Name'), array('all' => true, 'no_filter' => true)));
 
         if ($restriction === "False") {
@@ -238,11 +245,12 @@ class Output_SpokeJson
                 'recordtype_display' => 'interview',
                 'recordtype_t' => 'interview',
                 'restriction_t' => $restriction,
-                'interviewee_display' => $interviewees,
-                'interviewee_t' => $interviewees,
-                'author_display' => $interviewees,
-                'author_facet' => $interviewees,
-                'author_t' => $interviewees,
+                'interviewee_display' => $interviewees_lfm,
+                'interviewee_t' => $interviewees_lfm,
+                'interviewee_facet' => $interviewees_lfm,
+                'author_display' => $interviewees_fml,
+                'author_facet' => $interviewees_fml,
+                'author_t' => $interviewees_fml,
                 'interviewer_display' => $interviewers,
                 'interviewer_t' => $interviewers,
                 'accession_number_display' => $accession,
@@ -257,6 +265,8 @@ class Output_SpokeJson
                 'title_display' => $title,
                 'title_t' => $title,
                 'date_display' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
+                'date_t' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
+                'interview_image_display' => metadata($item, array('Item Type Metadata', 'Interview Featured Image'), array('no_filter' => true)),
             );
             $metadata = array_merge($metadata, array(
                 'cachefile_display' => metadata($item, array('Item Type Metadata', 'Interview Cache File')),
@@ -271,11 +281,12 @@ class Output_SpokeJson
                 'recordtype_display' => 'interview',
                 'recordtype_t' => 'interview',
                 'restriction_t' => $restriction,
-                'interviewee_display' => $interviewees,
-                'interviewee_t' => $interviewees,
-                'author_display' => $interviewees,
-                'author_facet' => $interviewees,
-                'author_t' => $interviewees,
+                'interviewee_display' => $interviewees_lfm,
+                'interviewee_t' => $interviewees_lfm,
+                'interviewee_facet' => $interviewees_lfm,
+                'author_display' => $interviewees_fml,
+                'author_facet' => $interviewees_fml,
+                'author_t' => $interviewees_fml,
                 'interviewer_display' => $interviewers,
                 'interviewer_t' => $interviewers,
                 'accession_number_display' => $accession,
@@ -285,6 +296,7 @@ class Output_SpokeJson
                 'title_display' => $title,
                 'title_t' => $title,
                 'date_display' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
+                'date_t' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
             );
             $metadata['restriction_display'] = "Restrictions";
         }
@@ -309,6 +321,7 @@ class Output_SpokeJson
                 $relatedSeries[] = $label;
             }
         }
+        $metadata['related_series_t'] = $metadata['related_series_display'];
         $metadata['series_display'] = implode('', $relatedSeries);
 
         return $metadata;
@@ -319,7 +332,7 @@ class Output_SpokeJson
         return json_encode($this->_metadata);
     }
 
-    public function getNames($list) {
+    public function getNames($list, $order = FIRST_MIDDLE_LAST) {
         $people = array();
         $keys = array('first', 'middle', 'last');
         foreach ($list as $text) {
@@ -330,7 +343,14 @@ class Output_SpokeJson
                     $pieces[] = $person[$key];
                 }
             }
-            $people[] = implode(' ', $pieces);
+            if ($order == FIRST_MIDDLE_LAST) {
+                $people[] = implode(' ', $pieces);
+            }
+            else {
+                $lastName = array_pop($pieces);
+                $suffix = implode(' ', $pieces);
+                $people[] = $lastName . ', ' . $suffix;
+            }
         }
         return $people;
     }
