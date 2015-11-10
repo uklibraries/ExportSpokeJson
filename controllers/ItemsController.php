@@ -25,4 +25,24 @@ class ExportSpokeJson_ItemsController extends Omeka_Controller_AbstractActionCon
             'default'
         );
     }
+
+    public function unindexAction()
+    {
+        $itemId = $this->_getParam('id');
+        $recursive = $this->_getParam('recursive');
+        Zend_Registry::get('bootstrap')->getResource('jobs')->sendLongRunning(
+            'ExportSpokeJson_Job_UnindexItem', array(
+                'itemId' => $itemId,
+                'recursive' => $recursive,
+            )
+        );
+        return $this->_helper->redirector->gotoRoute(
+            array(
+                'controller' => 'items',
+                'action' => 'show',
+                'id' => $itemId,
+            ),
+            'default'
+        );
+    }
 }
