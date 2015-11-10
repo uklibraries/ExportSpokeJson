@@ -16,6 +16,7 @@ class ExportSpokeJson_Job_ExportItem extends Omeka_Job_AbstractJob
     {
         $path = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'tmp';
         $export_path = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'exports';
+        mkdir($export_path, 0775, true);
         $item = get_record_by_id('Item', $this->_options['itemId']);
         $checker = new SuppressionChecker($item);
 
