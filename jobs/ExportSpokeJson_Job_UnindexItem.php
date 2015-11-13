@@ -21,6 +21,7 @@ class ExportSpokeJson_Job_UnindexItem extends Omeka_Job_AbstractJob
     {
         $path = dirname(dirname(__FILE__)) . DS . 'tmp';
         mkdir($path, 0775, true);
+        chmod($path, 0775);
         $unindex_path = dirname(dirname(__FILE__)) . DS . 'deletes';
         mkdir($unindex_path, 0775, true);
         chmod($unindex_path, 0775);
