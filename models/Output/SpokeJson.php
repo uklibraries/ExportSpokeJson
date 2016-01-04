@@ -86,6 +86,8 @@ class Output_SpokeJson
     {
         $item = $this->_item;
         $restriction = metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true));
+        $title = metadata($item, array('Dublin Core', 'Title'));
+        $accession = metadata($item, array('Item Type Metadata', 'Collection Accession'));
         $metadata = array(
             'id' => $this->ark(),
             'recordtype_display' => 'collection',
@@ -99,13 +101,15 @@ class Output_SpokeJson
             'subject_t' => metadata($item, array('Item Type Metadata', 'Collection LC Subject'), array('all' => true, 'no_filter' => true)),
             'material_type_display' => metadata($item, array('Item Type Metadata', 'Collection Master Type')),
             'material_type_t' => metadata($item, array('Item Type Metadata', 'Collection Master Type')),
-            'accession_number_display' => metadata($item, array('Item Type Metadata', 'Collection Accession')),
-            'accession_number_s' => metadata($item, array('Item Type Metadata', 'Collection Accession')),
-            'accession_number_t' => metadata($item, array('Item Type Metadata', 'Collection Accession')),
+            'accession_number_display' => $accession,
+            'accession_number_s' => $accession,
+            'accession_number_t' => $accession,
             'collection_display' => metadata($item, array('Dublin Core', 'Title')),
             'collection_facet' => metadata($item, array('Dublin Core', 'Title')),
-            'title_display' => metadata($item, array('Dublin Core', 'Title')),
-            'title_t' => metadata($item, array('Dublin Core', 'Title')),
+            'title_display' => $title,
+            'title_t' => $title,
+            'longtitle_display' => "$title ($accession)",
+            'longtitle_t' => "$title ($accession)",
             'title_added_entry_display' => metadata($item, array('Item Type Metadata', 'Collection Summary'), array('all' => true, 'no_filter' => true)),
             'title_added_entry_t' => metadata($item, array('Item Type Metadata', 'Collection Summary'), array('all' => true, 'no_filter' => true)),
             'theme_display' => metadata($item, array('Item Type Metadata', 'Collection Theme'), array('all' => true, 'no_filter' => true)),
@@ -133,6 +137,7 @@ class Output_SpokeJson
                 $metadata['related_series_display'][] = array(
                     'id' => metadata($subitem, array('Item Type Metadata', 'Series ARK Identifier'), array('no_filter' => true)),
                     'label' => metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true)),
+                    'accession_number' => metadata($subitem, array('Item Type Metadata', 'Series Accession')),
                 );
             }
         }
@@ -156,8 +161,8 @@ class Output_SpokeJson
             'id' => $this->ark(),
             'recordtype_display' => 'series',
             'recordtype_t' => 'series',
-            'title_display' => metadata($item, array('Dublin Core', 'Title')),
-            'title_t' => metadata($item, array('Dublin Core', 'Title')),
+            'title_display' => $title,
+            'title_t' => $title,
             'restriction_t' => $restriction,
             'related_series_display' => array(),
             'series_display' => $title,
@@ -172,6 +177,8 @@ class Output_SpokeJson
             'accession_number_display' => $accession_number,
             'accession_number_s' => $accession_number,
             'accession_number_t' => $accession_number,
+            'longtitle_display' => "$title ($accession_number)",
+            'longtitle_t' => "$title ($accession_number)",
             'title_added_entry_display' => $summary,
             'title_added_entry_t' => $summary,
             'material_type_display' => $type,
@@ -199,6 +206,7 @@ class Output_SpokeJson
                 $metadata['related_series_display'][] = array(
                     'id' => metadata($subitem, array('Item Type Metadata', 'Interview ARK Identifier'), array('no_filter' => true)),
                     'label' => metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true)),
+                    'accession_number' => metadata($subitem, array('Dublin Core', 'Identifier')),
                 );
             }
         }
@@ -264,6 +272,8 @@ class Output_SpokeJson
                 'title_added_entry_t' => $summary,
                 'title_display' => $title,
                 'title_t' => $title,
+                'longtitle_display' => "$title ($accession)",
+                'longtitle_t' => "$title ($accession)",
                 'date_display' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
                 'date_t' => metadata($item, array('Item Type Metadata', 'Interview Date'), array('all' => true, 'no_filter' => true)),
                 'interview_image_display' => metadata($item, array('Item Type Metadata', 'Interview Featured Image'), array('no_filter' => true)),

@@ -1,3 +1,4 @@
+<?php if ($exportable): ?>
 <div class="panel">
   <h4>Export SPOKEdb JSON</h4>
   <div>
@@ -19,3 +20,4 @@
     <?php } ?>
   </div>
 </div>
+<?php endif; ?>

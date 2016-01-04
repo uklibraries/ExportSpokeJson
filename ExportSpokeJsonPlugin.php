@@ -53,10 +53,14 @@ class ExportSpokeJsonPlugin extends Omeka_Plugin_AbstractPlugin
             else {
                 $visibleCheckbox = true;
             }
+            $subitemCount = $this->getSubitemCount($item);
+            $exportable = $subitemCount <= 200;
             echo get_view()->partial(
                 'export-panel.php',
                 array(
                     'visibleCheckbox' => $visibleCheckbox,
+                    'subitemCount' => $subitemCount,
+                    'exportable' => $exportable,
                 )
             );
         }
@@ -93,5 +97,21 @@ class ExportSpokeJsonPlugin extends Omeka_Plugin_AbstractPlugin
                 )
             )
         );
+    }
+
+    private function getSubitemCount($item) {
+        $count = 1;
+        $objects = get_db()->getTable('ItemRelationsRelation')->findByObjectItemId($item->id);
+        $objectRelations = array();
+        foreach ($objects as $object) {
+            if ($object->getPropertyText() !== "Is Part Of") {
+                continue;
+            }
+            if (!($subitem = get_record_by_id('item', $object->subject_item_id))) {
+                continue;
+            }
+            $count += $this->getSubitemCount($subitem);
+        }
+        return $count;
     }
 }
