@@ -53,8 +53,12 @@ class ExportSpokeJsonPlugin extends Omeka_Plugin_AbstractPlugin
             else {
                 $visibleCheckbox = true;
             }
-            $subitemCount = $this->getSubitemCount($item);
-            $exportable = $subitemCount <= 200;
+            $exportable = true;
+            # TODO: make this configurable
+            if (false) {
+                $subitemCount = $this->getSubitemCount($item);
+                $exportable = $subitemCount <= 200;
+            }
             echo get_view()->partial(
                 'export-panel.php',
                 array(
