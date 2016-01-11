@@ -37,6 +37,7 @@ class ExportSpokeJsonPlugin extends Omeka_Plugin_AbstractPlugin
             && $controller === 'items'
             && in_array($action, array('show')))
         {
+            queue_js_file('export_json');
             queue_js_file('delete_json');
         }
     }
@@ -75,14 +76,15 @@ class ExportSpokeJsonPlugin extends Omeka_Plugin_AbstractPlugin
         $args['router']->addRoute(
             'export_spoke_json_route',
             new Zend_Controller_Router_Route(
-                'items/export/:id',
+                'items/export/:id/:recursive',
                 array(
                     'module' => 'export-spoke-json',
                     'controller' => 'items',
                     'action' => 'export'
                 ),
                 array(
-                    'id' => '\d+'
+                    'id' => '\d+',
+                    'recursive' => '\d+',
                 )
             )
         );

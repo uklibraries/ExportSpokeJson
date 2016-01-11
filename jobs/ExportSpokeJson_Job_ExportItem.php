@@ -15,6 +15,7 @@ class ExportSpokeJson_Job_ExportItem extends Omeka_Job_AbstractJob
     public function perform()
     {
         $path = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'tmp';
+        $recursive = $this->_options['recursive'];
         $export_path = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'exports';
         mkdir($export_path, 0775, true);
         $item = get_record_by_id('Item', $this->_options['itemId']);
@@ -27,41 +28,45 @@ class ExportSpokeJson_Job_ExportItem extends Omeka_Job_AbstractJob
             chmod($filename, fileperms($filename) | 16);
             $export_filename = $export_path . DIRECTORY_SEPARATOR . $output->ark() . '.json';
             rename($filename, $export_filename);
-            switch ($output->itemType()) {
-            case "collections":
-                $objects = get_db()->getTable('ItemRelationsRelation')->findByObjectItemId($item->id);
-                $objectRelations = array();
-                foreach ($objects as $object) {
-                    if ($object->getPropertyText() !== "Is Part Of") {
-                        continue;
+            if ($recursive === "1") {
+                switch ($output->itemType()) {
+                case "collections":
+                    $objects = get_db()->getTable('ItemRelationsRelation')->findByObjectItemId($item->id);
+                    $objectRelations = array();
+                    foreach ($objects as $object) {
+                        if ($object->getPropertyText() !== "Is Part Of") {
+                            continue;
+                        }
+                        if (!($subitem = get_record_by_id('item', $object->subject_item_id))) {
+                            continue;
+                        }
+                        Zend_Registry::get('bootstrap')->getResource('jobs')->sendLongRunning(
+                            'ExportSpokeJson_Job_ExportItem', array(
+                                'itemId' => $object->subject_item_id,
+                                'recursive' => $recursive,
+                            )
+                        );
                     }
-                    if (!($subitem = get_record_by_id('item', $object->subject_item_id))) {
-                        continue;
+                    break;
+                case "series":
+                    $objects = get_db()->getTable('ItemRelationsRelation')->findByObjectItemId($item->id);
+                    $objectRelations = array();
+                    foreach ($objects as $object) {
+                        if ($object->getPropertyText() !== "Is Part Of") {
+                            continue;
+                        }
+                        if (!($subitem = get_record_by_id('item', $object->subject_item_id))) {
+                            continue;
+                        }
+                        Zend_Registry::get('bootstrap')->getResource('jobs')->sendLongRunning(
+                            'ExportSpokeJson_Job_ExportItem', array(
+                                'itemId' => $object->subject_item_id,
+                                'recursive' => $recursive,
+                            )
+                        );
                     }
-                    Zend_Registry::get('bootstrap')->getResource('jobs')->sendLongRunning(
-                        'ExportSpokeJson_Job_ExportItem', array(
-                            'itemId' => $object->subject_item_id,
-                        )
-                    );
+                    break;
                 }
-                break;
-            case "series":
-                $objects = get_db()->getTable('ItemRelationsRelation')->findByObjectItemId($item->id);
-                $objectRelations = array();
-                foreach ($objects as $object) {
-                    if ($object->getPropertyText() !== "Is Part Of") {
-                        continue;
-                    }
-                    if (!($subitem = get_record_by_id('item', $object->subject_item_id))) {
-                        continue;
-                    }
-                    Zend_Registry::get('bootstrap')->getResource('jobs')->sendLongRunning(
-                        'ExportSpokeJson_Job_ExportItem', array(
-                            'itemId' => $object->subject_item_id,
-                        )
-                    );
-                }
-                break;
             }
         }
     }

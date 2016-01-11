@@ -11,9 +11,11 @@ class ExportSpokeJson_ItemsController extends Omeka_Controller_AbstractActionCon
     public function exportAction()
     {
         $itemId = $this->_getParam('id');
+        $recursive = $this->_getParam('recursive');
         Zend_Registry::get('bootstrap')->getResource('jobs')->sendLongRunning(
             'ExportSpokeJson_Job_ExportItem', array(
                 'itemId' => $itemId,
+                'recursive' => $recursive,
             )
         );
         return $this->_helper->redirector->gotoRoute(
