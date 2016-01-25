@@ -90,6 +90,7 @@ class Output_SpokeJson
         $accession = metadata($item, array('Item Type Metadata', 'Collection Accession'));
         $metadata = array(
             'id' => $this->ark(),
+            'subordinate_interview_count_i' => $this->subordinateInterviewCount($item),
             'recordtype_display' => 'collection',
             'recordtype_t' => 'collection',
             'restriction_t' => $restriction,
@@ -159,6 +160,7 @@ class Output_SpokeJson
         $summary = metadata($item, array('Item Type Metadata', 'Series Summary'), array('all' => true, 'no_filter' => true));
         $metadata = array(
             'id' => $this->ark(),
+            'subordinate_interview_count_i' => $this->subordinateInterviewCount($item),
             'recordtype_display' => 'series',
             'recordtype_t' => 'series',
             'title_display' => $title,
@@ -194,6 +196,8 @@ class Output_SpokeJson
 
         $objects = get_db()->getTable('ItemRelationsRelation')->findByObjectItemId($item->id);
         $objectRelations = array();
+        $relatedInterviews = array();
+        $sortable = array();
         foreach ($objects as $object) {
             if ($object->getPropertyText() !== "Is Part Of") {
                 continue;
@@ -203,14 +207,63 @@ class Output_SpokeJson
             }
             $checker = new SuppressionChecker($subitem);
             if ($checker->exportable()) {
-                $metadata['related_series_display'][] = array(
+                $interviewees = array();
+                foreach(metadata($subitem, array('Item Type Metadata', 'Interviewee Name'), array('all' => true, 'no_filter' => true)) as $name) {
+                    $json = json_decode($name, true);
+                    $candidates = array();
+                    $keys = array(
+                        'first',
+                        'middle',
+                        'last',
+                    );
+                    foreach ($keys as $key) {
+                        if (strlen($json[$key]) > 0) {
+                            $candidates[] = $json[$key];
+                        }
+                    }
+                    $interviewee = implode(' ', $candidates);
+                    $interviewees[] = $interviewee;
+                }
+                $interviewers = array();
+                foreach(metadata($subitem, array('Item Type Metadata', 'Interviewer Name'), array('all' => true, 'no_filter' => true)) as $name) {
+                    $json = json_decode($name, true);
+                    $candidates = array();
+                    $keys = array(
+                        'first',
+                        'middle',
+                        'last',
+                    );
+                    foreach ($keys as $key) {
+                        if (strlen($json[$key]) > 0) {
+                            $candidates[] = $json[$key];
+                        }
+                    }
+                    $interviewer = implode(' ', $candidates);
+                    $interviewers[] = $interviewer;
+                }
+                $cachefile  = metadata($subitem, array('Item Type Metadata', 'Interview Cache File'), array('no_filter' => true));
+                if (strlen($cachefile) == 0) {
+                    $cachefile = false;
+                }
+                $accessionNumber = metadata($subitem, array('Dublin Core', 'Identifier'));
+                $relatedInterviews[] = array(
                     'id' => metadata($subitem, array('Item Type Metadata', 'Interview ARK Identifier'), array('no_filter' => true)),
                     'label' => metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true)),
-                    'accession_number' => metadata($subitem, array('Dublin Core', 'Identifier')),
+                    'accession_number' => $accessionNumber,
+                    'rights' => metadata($subitem, array('Dublin Core', 'Rights')),
+                    'cachefile' => $cachefile,
+                    'interviewee' => $interviewees,
+                    'date' => metadata($subitem, array('Item Type Metadata', 'Interview Date'), array('no_filter' => true)),
+                    'interviewer' => $interviewers,
                 );
             }
         }
-        $metadata['related_series_t'] = $metadata['related_series_display'];
+        foreach ($relatedInterviews as $key => $row) {
+            $sortable[$key] = $row['accession_number'];
+        }
+        array_multisort($sortable, SORT_ASC, $relatedInterviews);
+        $metadata['related_series_display'] = $relatedInterviews;
+        $metadata['related_series_t'] = $relatedInterviews;
 
         $relatedCollections = array();
         $subjects = get_db()->getTable('ItemRelationsRelation')->findBySubjectItemId($item->id);
@@ -333,7 +386,6 @@ class Output_SpokeJson
         }
         $metadata['related_series_t'] = $metadata['related_series_display'];
         $metadata['series_display'] = implode('', $relatedSeries);
-
         return $metadata;
     }
 
@@ -363,6 +415,27 @@ class Output_SpokeJson
             }
         }
         return $people;
+    }
+
+    private function subordinateInterviewCount($item) {
+        if ($item->getItemType()->name === 'interviews') {
+            $count = 1;
+        }
+        else {
+            $count = 0;
+        }
+        $objects = get_db()->getTable('ItemRelationsRelation')->findByObjectItemId($item->id);
+        $objectRelations = array();
+        foreach ($objects as $object) {
+            if ($object->getPropertyText() !== "Is Part Of") {
+                continue;
+            }
+            if (!($subitem = get_record_by_id('item', $object->subject_item_id))) {
+                continue;
+            }
+            $count += $this->subordinateInterviewCount($subitem);
+        }
+        return $count;
     }
 
     private $_metadata;
