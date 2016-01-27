@@ -32,7 +32,7 @@ class Output_SpokeJson
             $metadata = $this->getInterviewFields();
             break;
         }
-        $this->_metadata = $metadata;
+        $this->_metadata = $this->trim($metadata);
     }
 
     public function rights()
@@ -436,6 +436,18 @@ class Output_SpokeJson
             $count += $this->subordinateInterviewCount($subitem);
         }
         return $count;
+    }
+
+    private function trim($metadata) {
+        if (is_string($metadata)) {
+            return trim($metadata);
+        }
+        else {
+            foreach ($metadata as $key => $value) {
+                $metadata[$key] = $this->trim($value);
+            }
+            return $metadata;
+        }
     }
 
     private $_metadata;
