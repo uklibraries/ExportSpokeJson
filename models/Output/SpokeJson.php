@@ -87,7 +87,7 @@ class Output_SpokeJson
         $item = $this->_item;
         $restriction = metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true));
         $title = metadata($item, array('Dublin Core', 'Title'));
-        $accession = metadata($item, array('Item Type Metadata', 'Collection Accession'));
+        $accession = strtoupper(metadata($item, array('Dublin Core', 'Identifier')));
         $metadata = array(
             'id' => $this->ark(),
             'subordinate_interview_count_i' => $this->subordinateInterviewCount($item),
@@ -138,7 +138,7 @@ class Output_SpokeJson
                 $metadata['related_series_display'][] = array(
                     'id' => metadata($subitem, array('Item Type Metadata', 'Series ARK Identifier'), array('no_filter' => true)),
                     'label' => metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true)),
-                    'accession_number' => metadata($subitem, array('Item Type Metadata', 'Series Accession')),
+                    'accession_number' => strtoupper(metadata($subitem, array('Dublin Core', 'Identifier'))),
                 );
             }
         }
@@ -151,7 +151,7 @@ class Output_SpokeJson
     {
         $item = $this->_item;
         $restriction = metadata($item, array('Dublin Core', 'Rights'), array('no_filter' => true));
-        $accession_number = metadata($item, array('Item Type Metadata', 'Series Accession'));
+        $accession_number = strtoupper(metadata($item, array('Dublin Core', 'Identifier')));
         $keywords = metadata($item, array('Item Type Metadata', 'Series Keyword'), array('all' => true, 'no_filter' => true));
         $type = metadata($item, array('Item Type Metadata', 'Series Master Type'));
         $title = metadata($item, array('Dublin Core', 'Title'));
