@@ -126,6 +126,8 @@ class Output_SpokeJson
 
         $objects = get_db()->getTable('ItemRelationsRelation')->findByObjectItemId($item->id);
         $objectRelations = array();
+        $relatedSeries = array();
+        $sortable = array();
         foreach ($objects as $object) {
             if ($object->getPropertyText() !== "Is Part Of") {
                 continue;
@@ -135,15 +137,20 @@ class Output_SpokeJson
             }
             $checker = new SuppressionChecker($subitem);
             if ($checker->exportable()) {
-                $metadata['related_series_display'][] = array(
+                $accessionNumber = metadata($subitem, array('Dublin Core', 'Identifier'));
+                $relatedSeries[] = array(
                     'id' => metadata($subitem, array('Item Type Metadata', 'Series ARK Identifier'), array('no_filter' => true)),
                     'label' => metadata($subitem, array('Dublin Core', 'Title'), array('no_filter' => true)),
                     'accession_number' => strtoupper(metadata($subitem, array('Dublin Core', 'Identifier'))),
                 );
             }
         }
-        $metadata['related_series_t'] = $metadata['related_series_display'];
-
+        foreach ($relatedSeries as $key => $row) {
+            $sortable[$key] = $row['accession_number'];
+        }
+        array_multisort($sortable, SORT_ASC, $relatedSeries);
+        $metadata['related_series_t'] = $relatedSeries;
+        $metadata['related_series_display'] = $relatedSeries;
         return $metadata;
     }
 
