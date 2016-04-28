@@ -97,7 +97,7 @@ class Output_SpokeJson
             'related_series_display' => array(),
             'keyword_display' => metadata($item, array('Item Type Metadata', 'Collection Keyword'), array('all' => true, 'no_filter' => true)),
             'keyword_t' => metadata($item, array('Item Type Metadata', 'Collection Keyword'), array('all' => true, 'no_filter' => true)),
-            'links_display' => metadata($item, array('Item Type Metadata', "Collection Linked Resource'), array('all' => true, 'no_filter' => true)),
+            'links_display' => metadata($item, array('Item Type Metadata', 'Collection Linked Resource'), array('all' => true, 'no_filter' => true)),
             'subject_display' => metadata($item, array('Item Type Metadata', 'Collection LC Subject'), array('all' => true, 'no_filter' => true)),
             'subject_facet' => metadata($item, array('Item Type Metadata', 'Collection LC Subject'), array('all' => true, 'no_filter' => true)),
             'subject_t' => metadata($item, array('Item Type Metadata', 'Collection LC Subject'), array('all' => true, 'no_filter' => true)),
