@@ -7,12 +7,12 @@
  * @package Omeka\Plugins\ExportSpokeJson
  */
 
-define('DS', DIRECTORY_SEPARATOR);
-require_once "jobs" . DS . "ExportSpokeJson_Job_ExportItem.php";
-require_once "jobs" . DS . "ExportSpokeJson_Job_UnindexItem.php";
-require_once "models" . DS . "Output" . DIRECTORY_SEPARATOR . "SpokeJson.php";
+require_once "jobs" . DIRECTORY_SEPARATOR . "ExportSpokeJson_Job_ExportItem.php";
+require_once "jobs" . DIRECTORY_SEPARATOR . "ExportSpokeJson_Job_UnindexInterviews.php";
+require_once "jobs" . DIRECTORY_SEPARATOR . "ExportSpokeJson_Job_UnindexItem.php";
+require_once "models" . DIRECTORY_SEPARATOR . "Output" . DIRECTORY_SEPARATOR . "SpokeJson.php";
 $pluginDir = dirname(dirname(__FILE__));
-require_once $pluginDir . DS . "RecursiveSuppression" . DS . "models" . DS . "SuppressionChecker.php";
+require_once $pluginDir . DIRECTORY_SEPARATOR . "RecursiveSuppression" . DIRECTORY_SEPARATOR . "models" . DIRECTORY_SEPARATOR . "SuppressionChecker.php";
 
 class ExportSpokeJsonPlugin extends Omeka_Plugin_AbstractPlugin
 {
@@ -20,7 +20,90 @@ class ExportSpokeJsonPlugin extends Omeka_Plugin_AbstractPlugin
         'admin_head',
         'admin_items_show_sidebar',
         'define_routes',
+        'before_save_item',
     );
+
+    public function hookBeforeSaveItem($args)
+    {
+        if (empty($args['post'])) {
+            return;
+        }
+
+        $item = $args['record'];
+
+        if (empty($item->id)) {
+            return;
+        }
+
+        $suppressionField = false;
+        switch($item->getItemType()->name) {
+        case 'collections':
+            $suppressionField = 'Collection Suppressed';
+            break;
+        case 'series':
+            $suppressionField = 'Series Suppressed';
+            break;
+        case 'interviews':
+            $suppressionField = 'Interview Suppressed';
+            break;
+        }
+
+        if (!$suppressionField) {
+            return;
+        }
+
+        $elementSet = get_record('ElementSet', array('name' => 'Item Type Metadata'));
+        $element = false;
+        foreach ($elementSet->getElements() as $elt) {
+            if ($elt->name === $suppressionField) {
+                $element = $elt;
+                break;
+            }
+        }
+
+        if (!$element) {
+            return;
+        }
+
+        $id = $element->id;
+
+        $itemSuppressionMetadata = json_decode(
+            metadata($item, array('Item Type Metadata', $suppressionField), array('no_escape' => true, 'no_filter' => true)),
+            true
+        );
+
+        $postSuppressionMetadata = json_decode(
+            $args['post']['Elements'][$id][0]['text'],
+            true
+        );
+
+        if (array_key_exists('recursive', $itemSuppressionMetadata)) {
+            $recursiveInItem = $itemSuppressionMetadata['recursive'];
+            $recursiveInPost = $postSuppressionMetadata['recursive'];
+
+            # Should interviews in this item be suppressed?
+            if (!$recursiveInItem && $recursiveInPost) {
+                Zend_Registry::get('bootstrap')->getResource('jobs')->sendLongRunning(
+                    'ExportSpokeJson_Job_UnindexInterviews', array(
+                        'itemId' => $item['id'],
+                    )
+                );
+            }
+        }
+
+        $suppressedInItem = $itemSuppressionMetadata['description'];
+        $suppressedInPost = $postSuppressionMetadata['description'];
+
+        # Has this specific item just been suppressed?
+        if (!$suppressedInItem && $suppressedInPost) {
+            Zend_Registry::get('bootstrap')->getResource('jobs')->sendLongRunning(
+                'ExportSpokeJson_Job_UnindexItem', array(
+                    'itemId' => $item['id'],
+                    'recursive' => "0",
+                )
+            );
+        }
+    }
 
     public function hookAdminHead($args)
     {
@@ -55,6 +138,7 @@ class ExportSpokeJsonPlugin extends Omeka_Plugin_AbstractPlugin
                 $visibleCheckbox = true;
             }
             $exportable = true;
+            $subitemCount = 0;
             # TODO: make this configurable
             if (false) {
                 $subitemCount = $this->getSubitemCount($item);

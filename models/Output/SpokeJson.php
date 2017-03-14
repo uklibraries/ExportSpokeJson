@@ -6,9 +6,8 @@
  * @license http://opensource.org/licenses/MIT MIT
  * @package Omeka\Plugins\ExportSpokeJson */
 
-define('DS', DIRECTORY_SEPARATOR);
 $pluginDir = dirname(dirname(dirname(dirname(__FILE__))));
-require_once $pluginDir . DS . "RecursiveSuppression" . DS . "models" . DS . "SuppressionChecker.php";
+require_once $pluginDir . DIRECTORY_SEPARATOR . "RecursiveSuppression" . DIRECTORY_SEPARATOR . "models" . DIRECTORY_SEPARATOR . "SuppressionChecker.php";
 
 define('LAST_FIRST_MIDDLE', 1);
 define('FIRST_MIDDLE_LAST', 2);

@@ -6,8 +6,6 @@
  * @license http://opensource.org/licenses/MIT MIT
  * @package Omeka\Plugins\ExportSpokeJson */
 
-define('DS', DIRECTORY_SEPARATOR);
-
 class ExportSpokeJson_Job_UnindexItem extends Omeka_Job_AbstractJob
 {
     public function perform()
@@ -19,19 +17,19 @@ class ExportSpokeJson_Job_UnindexItem extends Omeka_Job_AbstractJob
 
     protected function clear($item, $recursive)
     {
-        $path = dirname(dirname(__FILE__)) . DS . 'tmp';
+        $path = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'tmp';
         mkdir($path, 0775, true);
         chmod($path, 0775);
-        $unindex_path = dirname(dirname(__FILE__)) . DS . 'deletes';
+        $unindex_path = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'deletes';
         mkdir($unindex_path, 0775, true);
         chmod($unindex_path, 0775);
 
         # delete this item
         $output = new Output_SpokeJson($item);
-        $filename = $path . DS . $output->ark();
+        $filename = $path . DIRECTORY_SEPARATOR . $output->ark();
         touch($filename);
         chmod($filename, 0664);
-        $unindex_filename = $unindex_path . DS . $output->ark();
+        $unindex_filename = $unindex_path . DIRECTORY_SEPARATOR . $output->ark();
         rename($filename, $unindex_filename);
 
         # ...and subobjects?

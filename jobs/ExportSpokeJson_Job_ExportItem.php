@@ -6,9 +6,8 @@
  * @license http://opensource.org/licenses/MIT MIT
  * @package Omeka\Plugins\ExportSpokeJson */
 
-define('DS', DIRECTORY_SEPARATOR);
 $pluginDir = dirname(dirname(dirname(__FILE__)));
-require_once $pluginDir . DS . "RecursiveSuppression" . DS . "models" . DS . "SuppressionChecker.php";
+require_once $pluginDir . DIRECTORY_SEPARATOR . "RecursiveSuppression" . DIRECTORY_SEPARATOR . "models" . DIRECTORY_SEPARATOR . "SuppressionChecker.php";
 
 class ExportSpokeJson_Job_ExportItem extends Omeka_Job_AbstractJob
 {
