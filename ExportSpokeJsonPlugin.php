@@ -99,7 +99,7 @@ class ExportSpokeJsonPlugin extends Omeka_Plugin_AbstractPlugin
             Zend_Registry::get('bootstrap')->getResource('jobs')->sendLongRunning(
                 'ExportSpokeJson_Job_UnindexItem', array(
                     'itemId' => $item['id'],
-                    'recursive' => "0",
+                    'recursive' => "1",
                 )
             );
         }
